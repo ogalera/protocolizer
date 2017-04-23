@@ -1,7 +1,6 @@
 package cat.ogasoft.protocolizer.exceptions;
 
 /**
- *
  * @author Oscar Galera i Alfaro
  * @date   Mar 19, 2017 [5:40:33 PM]
  */
