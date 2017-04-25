@@ -13,8 +13,9 @@ import java.util.List;
 public class Pen {
 
     public final int level;
-    private final String tabs;
-    private final String innerTabs;
+    private final String tab;
+    private final String innerTab;
+    private final String innerInnerTab;
     private final List<String> lines;
     private String begin;
     private String end;
@@ -27,8 +28,9 @@ public class Pen {
 
     public Pen(int level) {
         this.level = level;
-        tabs = tabs(level);
-        innerTabs = "    " + tabs;
+        tab = tabs(level);
+        innerTab = "    " + tab;
+        innerInnerTab = "    " + innerTab;
         this.lines = new LinkedList<>();
     }
 
@@ -46,7 +48,16 @@ public class Pen {
     }
 
     public void writeInnln(String line) {
-        lines.add(innerTabs + line);
+        lines.add(innerTab + line);
+    }
+
+    public void writeInnInnTabln(String line) {
+        writeInnInnln(line);
+        newLine();
+    }
+
+    public void writeInnInnln(String line) {
+        lines.add(innerInnerTab + line);
     }
 
     public void writeTabln(String line) {
@@ -55,7 +66,7 @@ public class Pen {
     }
 
     public void writeTab(String line) {
-        lines.add(tabs + line);
+        lines.add(tab + line);
     }
 
     public void writeln(String line) {
@@ -76,7 +87,7 @@ public class Pen {
     }
 
     public void addBegin(List<String> target) {
-        target.add(tabs + begin);
+        target.add(tab + begin);
         target.add("\n");
     }
 
@@ -85,7 +96,7 @@ public class Pen {
     }
 
     public void addEnd(List<String> target) {
-        target.add(tabs + end);
+        target.add(tab + end);
         target.add("\n");
     }
 }

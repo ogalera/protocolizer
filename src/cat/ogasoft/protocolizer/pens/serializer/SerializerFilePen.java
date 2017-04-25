@@ -16,9 +16,9 @@ import java.util.Iterator;
  * @brief DESCRIPTION
  */
 public class SerializerFilePen extends Pen {
-    
+
     private SerializerMessagePen message;
-    
+
     private SerializerFilePen(String packagee) {
         super(0);
         addComment("Protocolizer " + new SimpleDateFormat("dd/MM/yyyy kk:mm:ss").format(new Date()));
@@ -28,22 +28,24 @@ public class SerializerFilePen extends Pen {
         addComment("For any question, feel free to contact me at: oscar.galeraa@gmail.com");
         super.newLine();
         super.writeln("package " + packagee + ";");
+        super.newLine();
+        super.newLine();
     }
-    
+
     public SerializerFilePen addComment(String line) {
         super.writeln("//" + line);
         return this;
     }
-    
+
     public static SerializerFilePen build(String packagee) {
         return new SerializerFilePen(packagee);
     }
-    
+
     public SerializerMessagePen buildPublicMessage(String name) {
         message = SerializerMessagePen.buildPublic(0, name);
         return message;
     }
-    
+
     public void dump(File file) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             Iterator<String> fileLines = super.iterator();

@@ -5,6 +5,7 @@
  */
 package cat.ogasoft.protocolizer.pens.serializer;
 
+import cat.ogasoft.protocolizer.pens.FilePen;
 import cat.ogasoft.protocolizer.pens.Pen;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -27,16 +28,20 @@ public class SerializerMessagePen extends Pen {
 
     public static SerializerMessagePen buildPublic(int level, String name) {
         SerializerMessagePen data = new SerializerMessagePen("public", level, name);
-        data.newLine();
-        data.writeInnTabln("public byte[] dump(Object obj){");
-        data.writeInnTabln("return null;");
-        data.writeInnTabln("}");
-        data.newLine();
         return data;
     }
 
+    public static SerializerMessagePen buildPublicStatic(int level, String name, FilePen.FileDescriptor descriptor) {
+        SerializerMessagePen pen = new SerializerMessagePen("public static", level, name);
+        pen.writeInnTabln("public byte[] dump(" + descriptor.javaFQN + '.' + name + " target){");
+        pen.writeInnInnTabln("return null;");
+        pen.writeInnTabln("}");
+        return pen;
+    }
+
     public static SerializerMessagePen buildPrivate(int level, String name) {
-        return new SerializerMessagePen("private", level, name);
+        SerializerMessagePen pen = new SerializerMessagePen("private", level, name);
+        return pen;
     }
 
     public SerializerMessagePen addRequired(String field) {
@@ -51,8 +56,8 @@ public class SerializerMessagePen extends Pen {
         return this;
     }
 
-    public SerializerMessagePen messagePen(String name) {
-        SerializerMessagePen message = SerializerMessagePen.buildPrivate(super.level + 1, name);
+    public SerializerMessagePen messagePen(String name, FilePen.FileDescriptor descriptor) {
+        SerializerMessagePen message = SerializerMessagePen.buildPublicStatic(super.level + 1, name, descriptor);
         messages.add(message);
         return message;
     }

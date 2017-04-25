@@ -18,11 +18,14 @@ import java.util.List;
  */
 public class FilePen extends Pen {
 
+    public final FileDescriptor fileDescriptor; //<The java class associated with target protoc.
     private final List<MessagePen> messages;
     private final List<EnumPen> enums;
 
-    private FilePen() {
+    private FilePen(String javaFQN, String protocFQN) {
         super(0);
+        this.fileDescriptor = new FileDescriptor(javaFQN, protocFQN);
+
         this.messages = new LinkedList<>();
         this.enums = new LinkedList<>();
         addComment("Protocolizer " + new SimpleDateFormat("dd/MM/yyyy kk:mm:ss").format(new Date()));
@@ -32,8 +35,8 @@ public class FilePen extends Pen {
         super.newLine();
     }
 
-    public static FilePen build() {
-        return new FilePen();
+    public static FilePen build(String javaFQN, String protocFQN) {
+        return new FilePen(javaFQN, protocFQN);
     }
 
     public FilePen addComment(String line) {
@@ -103,5 +106,17 @@ public class FilePen extends Pen {
                 }
             }
         }
+    }
+
+    public final class FileDescriptor {
+
+        public final String javaFQN;
+        public final String protocFQN;
+
+        public FileDescriptor(String javaFQN, String protocFQN) {
+            this.javaFQN = javaFQN;
+            this.protocFQN = protocFQN;
+        }
+
     }
 }

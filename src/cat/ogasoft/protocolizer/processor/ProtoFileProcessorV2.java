@@ -20,6 +20,7 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.Iterator;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.type.TypeMirror;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 
@@ -38,7 +39,7 @@ public class ProtoFileProcessorV2 extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         boolean processed = true;
         try {
-            processFile(roundEnv);
+            FilePen filePen = processFile(roundEnv);
             processCompiler(roundEnv);
         } catch (Throwable t) {
             System.out.println(t.getMessage());
@@ -47,7 +48,8 @@ public class ProtoFileProcessorV2 extends AbstractProcessor {
         return processed;
     }
 
-    private void processFile(RoundEnvironment roundEnv) throws Exception {
+    private FilePen processFile(RoundEnvironment roundEnv) throws Exception {
+        FilePen filePen = null;
         for (Element element : roundEnv.getElementsAnnotatedWith(ProtoFileV2.File.class)) {
             ProtoFileV2.File protoc = element.getAnnotation(ProtoFileV2.File.class);
             ProtoFileV2.Serialize serialize = element.getAnnotation(ProtoFileV2.Serialize.class);
@@ -57,7 +59,7 @@ public class ProtoFileProcessorV2 extends AbstractProcessor {
                     throw new ProcessException("Unable to generate destination directory for protoc [" + protocPath.getAbsolutePath() + "]");
                 }
                 //First of all, we need to generate a protocol buffer field (the message).
-                FilePen filePen = generateProtoc(element);
+                filePen = generateProtoc(element);
                 if (protoc.generateSource()) {
                     filePen.dump(new File(protocPath, protoc.name() + ".proto"));
                 }
@@ -66,6 +68,7 @@ public class ProtoFileProcessorV2 extends AbstractProcessor {
                 }
             }
         }
+        return filePen;
     }
 
     private void serialize(String root, String packagee, String name, FilePen filePen) throws IOException, ProcessException {
@@ -82,10 +85,10 @@ public class ProtoFileProcessorV2 extends AbstractProcessor {
         while (messageIterador.hasNext()) {
             MessagePen mp = messageIterador.next();
             Iterator<Field> fieldsIterator = mp.fieldIterator();
-            SerializerMessagePen message = smp.messagePen(mp.getName());
+            SerializerMessagePen message = smp.messagePen(mp.getName(), filePen.fileDescriptor);
             while (fieldsIterator.hasNext()) {
                 Field field = fieldsIterator.next();
-                
+
             }
         }
         System.out.println("done");
@@ -128,12 +131,14 @@ public class ProtoFileProcessorV2 extends AbstractProcessor {
 
     /**
      * @pre --
-     * @post Generates the data that representas a protocol buffer field that is
-     * represented inside element.
+     * @post Generates the data that representing a protocol buffer field that
+     * is represented inside element.
      */
     private FilePen generateProtoc(Element element) throws Exception {
         ProtoFileV2.File file = element.getAnnotation(ProtoFileV2.File.class);
-        FilePen filePen = FilePen.build().setJavaPackage(file.javaPackage()).setOutterClassName(nullOrEmptyToName(file.name(), element));
+        String javaFQN = element.asType().toString();
+        String protocFQN = file.javaPackage() + '.' + file.name();
+        FilePen filePen = FilePen.build(javaFQN, protocFQN).setJavaPackage(file.javaPackage()).setOutterClassName(nullOrEmptyToName(file.name(), element));
         imports(filePen, element.getAnnotationsByType(ProtoFileV2.File.Import.class));
         options(filePen, element.getAnnotationsByType(ProtoFileV2.File.Option.class));
         content(filePen, element);
