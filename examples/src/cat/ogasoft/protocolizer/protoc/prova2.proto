@@ -1,0 +1,17 @@
+//Protocolizer 29/04/2017 15:03:40
+//This class has been generated automatically, please DO NOT EDIT!
+//For any question, feel free to contact me at: oscar.galeraa@gmail.com
+syntax = "proto2";
+
+option java_package = "cat.ogasoft.protocolizer.messages";
+
+option java_outer_classname = "prova2";
+
+
+message M1 {
+    repeated M2 llista = 1; //prova
+}
+
+message M2 {
+    required int32 caca = 1; //prova
+}

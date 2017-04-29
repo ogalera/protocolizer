@@ -43,11 +43,11 @@ public abstract class ProtoFileV2 {
     @Target(ElementType.TYPE)
     public static @interface File {
 
-        String protoFilePaths() default "src.cat.ogasoft.protocolizer.protoc";
+        String protoFilePath() default "src.cat.ogasoft.protocolizer.protoc";
 
-        String name(); //<The name of the Java calss generated after protoc compilation.
+        String pJavaName(); //<The name of the Java calss generated after protoc compilation (pJavaClass).
 
-        String javaPackage() default "cat.ogasoft.protocolizer.messages"; //<The package thats will contains the messages of the protocol.
+        String pJavaPackage() default "cat.ogasoft.protocolizer.messages"; //<The package thats will contains the messages of the protocol.
 
         boolean generateSource() default true; //<Indicates if the protoc must be created.
 
@@ -103,65 +103,70 @@ public abstract class ProtoFileV2 {
                  * @brief Set of types allowed by protocol buffer v2.
                  */
                 public static enum DataType {
-                    CALCULATED(null),
-                    COMPOSED(null),
-                    DOUBLE("double"),
-                    FLOAT("float"),
-                    INT32("int"),
-                    INT64("int"),
-                    UINT32("int"),
-                    UINT64("long"),
-                    SINT32("int"),
-                    SINT64("long"),
-                    FIXED32("int"),
-                    FIXED64("long"),
-                    SFIXED32("int"),
-                    SFIXED64("long"),
-                    BOOL("boolean"),
-                    STRING("String"),
-                    BYTES("ByteString");
+                    CALCULATED(null, null, null),
+                    COMPOSED(null, null, "!= null"),
+                    DOUBLE("double", "Double", "!= 0.0"),
+                    FLOAT("float", "Float", "!= 0.0"),
+                    INT32("int", "Integer", "!= 0"),
+                    INT64("int", "Integer", "!= 0"),
+                    UINT32("int", "Integer", "!= 0"),
+                    UINT64("long", "Long", "!= 0"),
+                    SINT32("int", "Integer", "!= 0"),
+                    SINT64("long", "Long", "!= 0"),
+                    FIXED32("int", "Integer", "!= 0"),
+                    FIXED64("long", "Long", "!= 0"),
+                    SFIXED32("int", "Integer", "!= 0"),
+                    SFIXED64("long", "Long", "!= 0"),
+                    BOOL("boolean", "Boolean", ""),
+                    STRING("String", null, "!= null"),
+                    BYTES("ByteString", null, "!= null");
 
-                    private final String type;
+                    public final String type;
+                    public final String classType;
+                    public final String cPositive;
 
-                    private DataType(String type) {
+                    private DataType(String type, String classType, String cPositive) {
                         this.type = type;
+                        this.classType = classType;
+                        this.cPositive = cPositive;
                     }
 
                     public void validate(String type) throws Exception {
-                        if (this.type != null && !this.type.equals(type)) {
-                            throw new Exception("Type missmatch, me: " + type + ", his: " + this.type);
+                        if (this.type != null && !this.type.equals(type) && !this.classType.equals(type)) {
+                            throw new Exception("Type missmatch, me: " + type + ", his: " + this.type + " or " + this.classType);
                         }
                     }
 
                     public static DataType calculate(String type) throws Exception {
+                        System.out.println("TYPE: " + type);
                         if (type == null) {
                             return COMPOSED;
                         }
-                        if (type.equals(DOUBLE.type)) {
+                        if (type.equals(DOUBLE.type) || type.equals(DOUBLE.classType)) {
                             return DOUBLE;
                         }
-                        if (type.equals(FLOAT.type)) {
+                        if (type.equals(FLOAT.type) || type.equals(FLOAT.classType)) {
                             return FLOAT;
                         }
-                        if (type.equals(INT32.type)) {
+                        if (type.equals(INT32.type) || type.equals(INT32.classType)) {
                             return INT32;
                         }
-                        if (type.equals(INT64.type)) {
+                        if (type.equals(INT64.type) || type.equals(INT64.classType)) {
                             return INT64;
                         }
-                        if (type.equals(SINT32.type)) {
+                        if (type.equals(SINT32.type) || type.equals(SINT32.classType)) {
                             return SINT32;
                         }
-                        if (type.equals(SINT64.type)) {
+                        if (type.equals(SINT64.type) || type.equals(SINT64.classType)) {
                             return SINT64;
                         }
-                        if (type.equals(FIXED32.type)) {
+                        if (type.equals(FIXED32.type) || type.equals(FIXED32.classType)) {
                             return FIXED32;
                         }
-                        if (type.equals(FIXED64.type)) {
+                        if (type.equals(FIXED64.type) || type.equals(FIXED64.classType)) {
                             return FIXED64;
                         }
-                        if (type.equals(BOOL.type)) {
+                        if (type.equals(BOOL.type) || type.equals(BOOL.classType)) {
                             return BOOL;
                         }
                         if (type.equals(STRING.type)) {
@@ -170,7 +175,11 @@ public abstract class ProtoFileV2 {
                         if (type.equals(BYTES.type)) {
                             return BYTES;
                         }
-                        throw new Exception("Cannot parse " + type);
+                        return COMPOSED;
+                    }
+
+                    public String type() {
+                        return type;
                     }
                 }
 
@@ -178,9 +187,15 @@ public abstract class ProtoFileV2 {
                  * @brief Set of field rules allowed by protocol buffer v2.
                  */
                 public static enum Label {
-                    REQUIRED,
-                    OPTIONAL,
-                    REPEATED;
+                    REQUIRED("required"),
+                    OPTIONAL("optional"),
+                    REPEATED("repeated");
+                    public final String name;
+
+                    private Label(String name) {
+                        this.name = name;
+                    }
+
                 }
 
                 Label label() default Label.REQUIRED; //<Label of the field.
