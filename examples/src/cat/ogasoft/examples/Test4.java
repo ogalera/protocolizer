@@ -6,7 +6,6 @@
 package cat.ogasoft.examples;
 
 import cat.ogasoft.protocolizer.annotations.ProtoFileV2;
-import java.util.List;
 
 /**
  * @author Oscar Galera i Alfaro
@@ -14,8 +13,8 @@ import java.util.List;
  *
  * @brief DESCRIPTION
  */
-@ProtoFileV2.File(pJavaName = "prova4", generateSource = true)
-@ProtoFileV2.Serialize
+//@ProtoFileV2.File(pJavaName = "prova6", generateSource = true)
+//@ProtoFileV2.Serialize
 public class Test4 {
 
     @ProtoFileV2.File.Message

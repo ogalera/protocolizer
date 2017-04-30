@@ -23,8 +23,6 @@ public abstract class ProtoFileV2 {
 
         String command();
 
-        String protoFilePaths() default "src.cat.ogasoft.protocolizer.protoc"; //<Path of .proto files.
-
         Language language() default Language.JAVA;
 
         public static enum Language {
@@ -43,8 +41,6 @@ public abstract class ProtoFileV2 {
     @Target(ElementType.TYPE)
     public static @interface File {
 
-        String protoFilePath() default "src.cat.ogasoft.protocolizer.protoc";
-
         String pJavaName(); //<The name of the Java calss generated after protoc compilation (pJavaClass).
 
         String pJavaPackage() default "cat.ogasoft.protocolizer.messages"; //<The package thats will contains the messages of the protocol.
@@ -56,14 +52,23 @@ public abstract class ProtoFileV2 {
         @interface Import {
 
             public static enum ACCESS {
-                NONE,
-                WEAK,
-                PUBLIC;
+                NONE("none"),
+                WEAK("weak"),
+                PUBLIC("public");
+                private final String name;
+
+                private ACCESS(String name) {
+                    this.name = name;
+                }
+
+                public String getName() {
+                    return name;
+                }
             }
 
             ACCESS access() default ACCESS.NONE;
 
-            String name(); //<Name of the import.
+            Class<?> importClass(); //<Name of the import.
         }
 
         /**
@@ -138,7 +143,6 @@ public abstract class ProtoFileV2 {
                     }
 
                     public static DataType calculate(String type) throws Exception {
-                        System.out.println("TYPE: " + type);
                         if (type == null) {
                             return COMPOSED;
                         }

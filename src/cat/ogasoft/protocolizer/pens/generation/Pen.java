@@ -16,6 +16,7 @@ public class Pen {
     private final String tab;
     private final String innerTab;
     private final String innerInnerTab;
+    private final String innerInnerInnerTab;
     private final List<String> lines;
     private String begin;
     private String end;
@@ -31,6 +32,7 @@ public class Pen {
         tab = tabs(level);
         innerTab = "    " + tab;
         innerInnerTab = "    " + innerTab;
+        innerInnerInnerTab = "    " + innerInnerTab;
         this.lines = new LinkedList<>();
     }
 
@@ -58,6 +60,15 @@ public class Pen {
 
     public void writeInnInnln(String line) {
         lines.add(innerInnerTab + line);
+    }
+
+    public void writeInnInnInnTabln(String line) {
+        writeInnInnInnln(line);
+        newLine();
+    }
+
+    public void writeInnInnInnln(String line) {
+        lines.add(innerInnerInnerTab + line);
     }
 
     public void writeTabln(String line) {

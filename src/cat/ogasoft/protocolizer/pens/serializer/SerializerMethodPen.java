@@ -67,15 +67,22 @@ public class SerializerMethodPen extends Pen {
                         if (javaFQN.contains("<")) {
                             type = javaFQN.substring(javaFQN.indexOf('<') + 1, javaFQN.lastIndexOf('>'));
                         }
-                        super.writeInnTabln("for(" + type + " k:target." + getGetterJava(field, field.javaName) + "()){");
-                        String parameter = methodsNS.get(mFQN2pFQN.get(type)) + "(k)";
-                        super.writeInnInnTabln("builder." + getAdderProto(field.protoName) + "(" + parameter + ");");
+                        super.writeInnTabln("if(target." + getGetterJava(field, field.javaName) + "() != null){");
+                        super.writeInnInnTabln("for(" + type + " k:target." + getGetterJava(field, field.javaName) + "()){");
+                        String parameter = enumsNS.get(type);
+                        if (parameter != null) {
+                            parameter += ".valueOf(k.name())";
+                        } else {
+                            parameter = methodsNS.get(mFQN2pFQN.get(type)) + "(k)";
+                        }
+                        super.writeInnInnInnTabln("builder." + getAdderProto(field.protoName) + "(" + parameter + ");");
+                        super.writeInnInnTabln("}");
+                        super.writeInnTabln("}");
                     } else {
-                        System.out.println("simple");
                         super.writeInnTabln("for(" + field.type.type + " k:target." + getGetterJava(field, field.javaName) + "()){");
                         super.writeInnInnTabln("builder." + getAdderProto(field.protoName) + "(k);");
+                        super.writeInnTabln("}");
                     }
-                    super.writeInnTabln("}");
                     break;
             }
         }

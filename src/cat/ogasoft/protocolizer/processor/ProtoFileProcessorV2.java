@@ -52,6 +52,10 @@ public class ProtoFileProcessorV2 extends AbstractProcessor {
                 }
             }
 
+            for (FilePen filePen : filePensMap.values()) {
+                filePen.dump(filePensMap);
+            }
+
             //PHASE 2- Compile protoc messages.
             //At this point all protoc messages has been generated, so must we compile theses protoc files?
             CompilerPhase.processCompiler(roundEnv);
@@ -83,6 +87,7 @@ public class ProtoFileProcessorV2 extends AbstractProcessor {
                 serializerFilePen.dump();
             }
         } catch (Throwable t) {
+            System.out.println(t.getMessage());
             processed = false;
         }
         return processed;

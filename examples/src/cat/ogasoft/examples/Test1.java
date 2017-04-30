@@ -13,8 +13,8 @@ import cat.ogasoft.protocolizer.annotations.ProtoFileV2;
  *
  * @brief DESCRIPTION
  */
-@ProtoFileV2.File(pJavaName = "provaaa", generateSource = true)
-@ProtoFileV2.Serialize
+//@ProtoFileV2.File(pJavaName = "provaaa", generateSource = true)
+//@ProtoFileV2.Serialize
 public class Test1 {
 
     @ProtoFileV2.File.Message

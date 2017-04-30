@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Oscar Galera i Alfaro
@@ -23,6 +24,7 @@ public class FilePen extends Pen {
     public final FileDescriptor fileDescriptor; //<All the info relationated with this file.
     private final List<MessagePen> messages; //<All inner messages.
     private final List<EnumPen> enums; //<All inner enumerations
+    private final List<String> imports;
 
     /**
      * @pre --
@@ -39,6 +41,7 @@ public class FilePen extends Pen {
         this.fileDescriptor = fileDescriptor;
         this.messages = new LinkedList<>();
         this.enums = new LinkedList<>();
+        this.imports = new LinkedList<>();
         super.writeln("syntax = \"proto2\";");
         super.newLine();
         super.writeln("option java_package = \"" + fileDescriptor.pJavaPackage + "\";");
@@ -68,7 +71,7 @@ public class FilePen extends Pen {
     }
 
     public FilePen addImport(String access, String line) {
-        super.writeln("import " + access + " \"" + line + "\";");
+        imports.add(line);
         return this;
     }
 
@@ -92,16 +95,24 @@ public class FilePen extends Pen {
     public Iterator<MessagePen> messageIterator() {
         return messages.iterator();
     }
-    
+
     public Iterator<EnumPen> enumIterator() {
         return enums.iterator();
     }
 
-    public void dump(File file) throws IOException {
+    public void dump(Map<String, FilePen> mFQN2MessagePen) throws IOException {
+        dump(new File(fileDescriptor.path + ".proto"), mFQN2MessagePen);
+    }
+
+    public void dump(File file, Map<String, FilePen> mFQN2MessagePen) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             Iterator<String> fileLines = super.iterator();
             while (fileLines.hasNext()) {
                 writer.write(fileLines.next());
+            }
+            for (String importt : imports) {
+                writer.write("import \"" + mFQN2MessagePen.get(importt).fileDescriptor.pJavaClass.replace('.', File.separatorChar) + ".proto\";");
+                writer.newLine();
             }
             for (MessagePen message : messages) {
                 writer.newLine();

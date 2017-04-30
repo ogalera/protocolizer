@@ -14,8 +14,8 @@ import java.util.List;
  *
  * @brief DESCRIPTION
  */
-@ProtoFileV2.File(pJavaName = "prova2", generateSource = true)
-@ProtoFileV2.Serialize
+//@ProtoFileV2.File(pJavaName = "prova2", generateSource = true)
+//@ProtoFileV2.Serialize
 public class Test3 {
 
     @ProtoFileV2.File.Message

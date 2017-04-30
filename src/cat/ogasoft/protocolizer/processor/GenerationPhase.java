@@ -10,6 +10,7 @@ import java.io.File;
 import java.util.Map;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.type.MirroredTypeException;
 
 /**
  * @author Oscar Galera i Alfaro
@@ -23,15 +24,14 @@ public class GenerationPhase {
         FilePen filePen = null;
         try {
             String pJavaName = nullOrEmptyToName(protoc.pJavaName(), element);
-            String protocFile = protoc.protoFilePath().replace('.', File.separatorChar) + File.separatorChar + pJavaName;
-            File protocPath = new File(protoc.protoFilePath().replace('.', File.separatorChar));
-            if (!protocPath.exists() && !protocPath.mkdirs()) {
-                throw new Exception("Unable to generate destination directory for protoc [" + protocPath.getAbsolutePath() + "]");
+            char separator = File.separatorChar;
+            String protocPath = "src" + separator + "cat" + separator + "ogasoft" + separator + "protocolizer" + separator + "protoc";
+            String protocFile = protocPath + File.separatorChar + pJavaName;
+            File fProtocPath = new File(protocPath);
+            if (!fProtocPath.exists() && !fProtocPath.mkdirs()) {
+                throw new Exception("Unable to generate destination directory for protoc [" + fProtocPath.getAbsolutePath() + "]");
             }
             filePen = generateProtoc(protocFile, element, mFQN2pFQN);
-            if (protoc.generateSource()) {
-                filePen.dump(new File(protocFile + ".proto"));
-            }
         } catch (Exception e) {
             throw new GenerationException(e.getMessage());
         }
@@ -133,9 +133,13 @@ public class GenerationPhase {
         }
     }
 
-    private static void imports(FilePen filePen, ProtoFileV2.File.Import[] imports) {
+    private static void imports(FilePen filePen, ProtoFileV2.File.Import[] imports) throws GenerationException {
         for (ProtoFileV2.File.Import importt : imports) {
-            filePen.addImport(importt.access().name().toLowerCase(), importt.name());
+            try {
+                importt.importClass().getName();
+            } catch (MirroredTypeException mte) {
+                filePen.addImport(importt.access().getName(), mte.getTypeMirror().toString());
+            }
         }
     }
 
