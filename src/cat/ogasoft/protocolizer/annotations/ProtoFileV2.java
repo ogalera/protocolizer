@@ -254,13 +254,19 @@ public abstract class ProtoFileV2 {
 
     @Retention(RetentionPolicy.SOURCE)
     @Target(ElementType.TYPE)
-    public static @interface Serialize {
+    public static @interface Dumpper {
+
+        public static enum DumpperTypes {
+            SERIALIZER,
+            DESERIALIZER,
+            BOTH;
+        }
 
         String root() default "src";
 
-        String javaPackage() default "cat.ogasoft.protocolizer.serializers";
-
         boolean parallel() default false;
+
+        DumpperTypes type() default DumpperTypes.BOTH;
     }
 
     public static enum AnnotationTypes {

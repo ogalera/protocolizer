@@ -1,14 +1,17 @@
 package cat.ogasoft.protocolizer.processor;
 
 import cat.ogasoft.protocolizer.annotations.ProtoFileV2;
-import cat.ogasoft.protocolizer.exceptions.SerializationException;
+import static cat.ogasoft.protocolizer.annotations.ProtoFileV2.Dumpper.DumpperTypes.BOTH;
+import static cat.ogasoft.protocolizer.annotations.ProtoFileV2.Dumpper.DumpperTypes.DESERIALIZER;
+import static cat.ogasoft.protocolizer.annotations.ProtoFileV2.Dumpper.DumpperTypes.SERIALIZER;
+import cat.ogasoft.protocolizer.exceptions.DumpperException;
 import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.TypeElement;
 import cat.ogasoft.protocolizer.pens.generation.FilePen;
-import cat.ogasoft.protocolizer.pens.serializer.SerializerFilePen;
+import cat.ogasoft.protocolizer.pens.dumppers.DumppersFilePen;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,6 +33,8 @@ import javax.lang.model.element.Element;
     "cat.ogasoft.protocolizer.annotations.ProtoFileV2.Compiler",
     "cat.ogasoft.protocolizer.annotations.ProtoFileV2.Serializer"})
 public class ProtoFileProcessorV2 extends AbstractProcessor {
+
+    private static final String DUMPPERS_PATH = "cat.ogasoft.protocolizer.dumppers";
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
@@ -72,20 +77,30 @@ public class ProtoFileProcessorV2 extends AbstractProcessor {
              * We have to construct all the methods at the end of the process,
              * so first of all we collect all methods in methods list.
              */
-            final List<SerializerFilePen> serializerFilePens = new LinkedList<>();
-            for (Element element : roundEnv.getElementsAnnotatedWith(ProtoFileV2.Serialize.class)) {
+            final List<DumppersFilePen> dummperFilePens = new LinkedList<>();
+            for (Element element : roundEnv.getElementsAnnotatedWith(ProtoFileV2.Dumpper.class)) {
                 FilePen fp = filePensMap.get(element.asType().toString());
                 //We need the FilePen associated with the message to generate the serializer.
                 if (fp == null) {
-                    throw new SerializationException("You can't generate a serialization for class that is not a message");
+                    throw new DumpperException("You can't generate a dumpper for class that is not a message");
                 }
-                ProtoFileV2.Serialize serialize = element.getAnnotation(ProtoFileV2.Serialize.class);
-                serializerFilePens.add(SerializerPhase.serialize(serialize.root(), serialize.javaPackage(), fp, methodsNS, enumsNS));
+                ProtoFileV2.Dumpper dumper = element.getAnnotation(ProtoFileV2.Dumpper.class);
+                boolean serialize = dumper.type() == SERIALIZER || dumper.type() == BOTH;
+                boolean deserialize = dumper.type() == DESERIALIZER || dumper.type() == BOTH;
+                dummperFilePens.add(DumpperPhase.dump(serialize, deserialize, dumper.root(), DUMPPERS_PATH, fp, methodsNS, enumsNS));
             }
-            for (SerializerFilePen serializerFilePen : serializerFilePens) {
-                serializerFilePen.constructMethods(methodsNS, enumsNS, mFQN2pFQN);
-                serializerFilePen.dump();
+
+            for (DumppersFilePen dumpperFilePen : dummperFilePens) {
+                if (dumpperFilePen.hasSerializer()) {
+                    dumpperFilePen.getSerializer().constructSerializerMethods(methodsNS, enumsNS, mFQN2pFQN);
+                    dumpperFilePen.getSerializer().dumpSerialize();
+                }
+                if (dumpperFilePen.hasDeserializer()) {
+                    dumpperFilePen.getDeserializer().constructDeserializerMethods(methodsNS, enumsNS, mFQN2pFQN);
+                    dumpperFilePen.getDeserializer().dumpDeserialize();
+                }
             }
+
         } catch (Throwable t) {
             System.out.println(t.getMessage());
             processed = false;

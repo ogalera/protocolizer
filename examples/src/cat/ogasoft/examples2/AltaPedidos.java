@@ -18,7 +18,7 @@ import java.util.List;
  * @brief DESCRIPTION
  */
 @ProtoFileV2.File(pJavaName = "AltaPedidos", generateSource = true)
-@ProtoFileV2.Serialize
+@ProtoFileV2.Dumpper(type = ProtoFileV2.Dumpper.DumpperTypes.BOTH)
 @ProtoFileV2.File.Import(importClass = Compartido.class)
 public class AltaPedidos {
 
@@ -231,7 +231,7 @@ public class AltaPedidos {
     }
 
     @ProtoFileV2.File.Message
-    public class AltaPedidosRes {
+    public static class AltaPedidosRes {
 
         @ProtoFileV2.File.Message.Field
         private String idPedido;

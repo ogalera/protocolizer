@@ -15,7 +15,7 @@ import java.util.List;
  * @brief DESCRIPTION
  */
 @ProtoFileV2.File(pJavaName = "Compartido", generateSource = true)
-@ProtoFileV2.Serialize
+@ProtoFileV2.Dumpper(type = ProtoFileV2.Dumpper.DumpperTypes.BOTH)
 public class Compartido {
 
     @ProtoFileV2.File.Enum
@@ -855,6 +855,11 @@ public class Compartido {
             this.tipo = tipo;
         }
 
+        @Override
+        public String toString() {
+            return "Archivo{" + "idArchivo=" + idArchivo + ", tipo=" + tipo + '}';
+        }
+
     }
 
     @ProtoFileV2.File.Message
@@ -941,6 +946,10 @@ public class Compartido {
             this.tituloImpuesto = tituloImpuesto;
         }
 
+        @Override
+        public String toString() {
+            return "DatosTaller{" + "nombreComercial=" + nombreComercial + ", direccion=" + direccion + ", telefono=" + telefono + ", movil=" + movil + ", email=" + email + ", precioHora=" + precioHora + ", porcentajeImpuesto=" + porcentajeImpuesto + ", tituloImpuesto=" + tituloImpuesto + '}';
+        }
     }
 
     @ProtoFileV2.File.Enum

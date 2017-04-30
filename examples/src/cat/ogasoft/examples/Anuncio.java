@@ -14,8 +14,8 @@ import java.util.List;
  *
  * @brief DESCRIPTION
  */
-//@ProtoFileV2.File(pJavaName = "Anuncio", pJavaPackage = "com.ad.connector.protobuf", generateSource = true)
-//@ProtoFileV2.Serialize
+@ProtoFileV2.File(pJavaName = "Anuncio", pJavaPackage = "com.ad.connector.protobuf", generateSource = true)
+@ProtoFileV2.Dumpper
 public class Anuncio {
 
     @ProtoFileV2.File.Message

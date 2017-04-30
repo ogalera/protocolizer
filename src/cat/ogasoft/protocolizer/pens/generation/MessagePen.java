@@ -64,7 +64,7 @@ public class MessagePen extends Pen {
     }
 
     public MessagePen addField(String comment, Label label, String javaName, String javaFQN, String protoName, DataType type, String composedType) {
-        Field field = new Field(comment, label, javaName, javaFQN, protoName, type, composedType);
+        Field field = new Field(comment, label, javaName, javaFQN, protoName, pJavaFQN + '.' + protoName, type, composedType);
         String typus = field.type == ProtoFileV2.File.Message.Field.DataType.COMPOSED ? field.composedType : type.name().toLowerCase();
         if (!Strings.isNullOrEmpty(field.comment)) {
             super.writeInnTabln(field.label.name + " " + typus + " " + field.protoName + " = " + (this.ids++) + "; //" + Strings.nullToEmpty(field.comment));
@@ -114,15 +114,17 @@ public class MessagePen extends Pen {
         public final Label label;
         public final String javaFQN;
         public final String javaName;
+        public final String protoFQN;
         public final String protoName;
         public final DataType type;
         public final String composedType;
 
-        public Field(String comment, Label label, String javaName, String javaFQN, String protoName, DataType type, String composedType) {
+        public Field(String comment, Label label, String javaName, String javaFQN, String protoName, String protoFQN, DataType type, String composedType) {
             this.comment = comment;
             this.label = label;
             this.javaName = javaName;
             this.protoName = protoName;
+            this.protoFQN = protoFQN;
             this.type = type;
             this.composedType = composedType;
             this.javaFQN = javaFQN;
