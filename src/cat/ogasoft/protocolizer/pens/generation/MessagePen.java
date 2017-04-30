@@ -23,11 +23,12 @@ public class MessagePen extends Pen {
     public final String pJavaPackage;
     public final String pJavaClass;
     public final String pJavaFQN;
+    public final boolean parallel;
     private final List<Field> fields;
     private final List<MessagePen> messages;
     private final List<EnumPen> enums;
 
-    private MessagePen(int level, String mJavaPackage, String mJavaClass, String pJavaPackage, String pJavaClass) {
+    private MessagePen(int level, String mJavaPackage, String mJavaClass, String pJavaPackage, String pJavaClass, boolean parallel) {
         super(level, "message " + pJavaClass + " {", "}");
         this.mJavaPackage = mJavaPackage;
         this.mJavaClass = mJavaClass;
@@ -35,22 +36,23 @@ public class MessagePen extends Pen {
         this.pJavaClass = pJavaClass;
         this.pJavaPackage = pJavaPackage;
         this.pJavaFQN = pJavaPackage + '.' + pJavaClass;
+        this.parallel = parallel;
         ids = 1;
         messages = new LinkedList<>();
         enums = new LinkedList<>();
         fields = new LinkedList<>();
     }
 
-    public static MessagePen build(String mJavaPackage, String mJavaClass, String pJavaPackage, String pJavaClass) {
-        return build(0, mJavaPackage, mJavaClass, pJavaPackage, pJavaClass);
+    public static MessagePen build(String mJavaPackage, String mJavaClass, String pJavaPackage, String pJavaClass, boolean parallel) {
+        return build(0, mJavaPackage, mJavaClass, pJavaPackage, pJavaClass, parallel);
     }
 
-    private static MessagePen build(int level, String mJavaPackage, String mJavaClass, String pJavaPackage, String pJavaClass) {
-        return new MessagePen(level, mJavaPackage, mJavaClass, pJavaPackage, pJavaClass);
+    private static MessagePen build(int level, String mJavaPackage, String mJavaClass, String pJavaPackage, String pJavaClass, boolean parallel) {
+        return new MessagePen(level, mJavaPackage, mJavaClass, pJavaPackage, pJavaClass, parallel);
     }
 
-    public MessagePen messagePen(String mJavaClass, String pJavaClass) {
-        MessagePen mp = MessagePen.build(super.level + 1, this.mJavaFQN, mJavaClass, this.pJavaFQN, pJavaClass);
+    public MessagePen messagePen(String mJavaClass, String pJavaClass, boolean parallel) {
+        MessagePen mp = MessagePen.build(super.level + 1, this.mJavaFQN, mJavaClass, this.pJavaFQN, pJavaClass, parallel);
         messages.add(mp);
         return mp;
     }

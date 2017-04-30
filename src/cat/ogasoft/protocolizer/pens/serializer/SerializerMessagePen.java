@@ -23,12 +23,34 @@ public class SerializerMessagePen extends Pen {
     private final List<SerializerMessagePen> messages;
     private final Map<String, String> builders;
     private final String sJavaFQN;
-    private final String mJavaFQN;
     private final List<SerializerMethodPen> methods;
 
-    private SerializerMessagePen(int level, String sJavaClass, String sJavaFQN, String mJavaFQN, String pJavaClass, Map<String, String> builders) {
+    private SerializerMessagePen(int level, String sJavaClass, String sJavaFQN, String mJavaFQN, String pJavaClass, Map<String, String> builders, boolean parallel) {
         //For each protoc message, we have a public static class...
-        super(level, "public static class " + sJavaClass + " {", "}");
+        super(level, "public static class " + sJavaClass + (parallel ? " extends Thread implements cat.ogasoft.protocolizer.SerializerProtoWorker<" + mJavaFQN + ">" : "") + " {", "}");
+        if (parallel) {
+            super.writeInnTabln("private byte[] bytes;");
+            super.writeInnTabln("private " + mJavaFQN + " container;");
+            super.newLine();
+            super.newLine();
+            super.writeInnTabln("@Override");
+            super.writeInnTabln("public void work(" + mJavaFQN + " container) {");
+            super.writeInnInnTabln("this.container = container;");
+            super.writeInnInnTabln("super.setName(\"" + sJavaFQN + "Worker\");");
+            super.writeInnInnTabln("start();");
+            super.writeInnTabln("}");
+            super.newLine();
+            super.writeInnTabln("@Override");
+            super.writeInnTabln("public byte[] waitUntilEnd() throws InterruptedException {");
+            super.writeInnInnTabln("this.join();");
+            super.writeInnInnTabln("return bytes;");
+            super.writeInnTabln("}");
+            super.newLine();
+            super.writeInnTabln("@Override");
+            super.writeInnTabln("public void run() {");
+            super.writeInnInnTabln("bytes = dump(container);");
+            super.writeInnTabln("}");
+        }
         super.writeInnTabln("public byte[] dump(" + mJavaFQN + " target){");
         super.writeInnInnTabln("return build" + pJavaClass + "(target).toByteArray();");
         super.writeInnTabln("}");
@@ -36,18 +58,17 @@ public class SerializerMessagePen extends Pen {
         this.messages = new LinkedList<>();
         this.builders = builders;
         this.sJavaFQN = sJavaFQN;
-        this.mJavaFQN = mJavaFQN;
     }
 
-    public static SerializerMessagePen build(String sJavaPackage, String sJavaClass, String mJavaFQN, String pJavaClass, Map<String, String> builders) {
+    public static SerializerMessagePen build(String sJavaPackage, String sJavaClass, String mJavaFQN, String pJavaClass, Map<String, String> builders, boolean parallel) {
         String sJavaFQN = sJavaPackage + '.' + sJavaClass;
-        SerializerMessagePen pen = new SerializerMessagePen(1, sJavaClass, sJavaFQN, mJavaFQN, pJavaClass, builders);
+        SerializerMessagePen pen = new SerializerMessagePen(1, sJavaClass, sJavaFQN, mJavaFQN, pJavaClass, builders, parallel);
         return pen;
     }
 
-    public SerializerMessagePen buildInn(String sJavaClass, String mJavaFQN, String pJavaClass) {
+    public SerializerMessagePen buildInn(String sJavaClass, String mJavaFQN, String pJavaClass, boolean parallel) {
         String sJavaFQNtmp = this.sJavaFQN + '.' + sJavaClass;
-        SerializerMessagePen pen = new SerializerMessagePen(level + 1, sJavaClass, sJavaFQNtmp, mJavaFQN, pJavaClass, builders);
+        SerializerMessagePen pen = new SerializerMessagePen(level + 1, sJavaClass, sJavaFQNtmp, mJavaFQN, pJavaClass, builders, parallel);
         this.messages.add(pen);
         return pen;
     }

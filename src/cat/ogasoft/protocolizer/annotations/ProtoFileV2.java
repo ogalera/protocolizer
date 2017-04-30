@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
  */
 public abstract class ProtoFileV2 {
 
-    @Retention(RetentionPolicy.CLASS)
+    @Retention(RetentionPolicy.SOURCE)
     @Target(ElementType.TYPE)
     public static @interface Compiler {
 
@@ -37,7 +37,7 @@ public abstract class ProtoFileV2 {
         }
     }
 
-    @Retention(RetentionPolicy.CLASS)
+    @Retention(RetentionPolicy.SOURCE)
     @Target(ElementType.TYPE)
     public static @interface File {
 
@@ -47,6 +47,7 @@ public abstract class ProtoFileV2 {
 
         boolean generateSource() default true; //<Indicates if the protoc must be created.
 
+        @Retention(RetentionPolicy.SOURCE)
         @Target(ElementType.TYPE)
         @Repeatable(Imports.class)
         @interface Import {
@@ -74,6 +75,7 @@ public abstract class ProtoFileV2 {
         /**
          * @brief Imports container.
          */
+        @Retention(RetentionPolicy.SOURCE)
         @Target(ElementType.TYPE)
         @interface Imports {
 
@@ -83,6 +85,7 @@ public abstract class ProtoFileV2 {
         /**
          * @brief An option in the protoc file.
          */
+        @Retention(RetentionPolicy.SOURCE)
         @Target(ElementType.TYPE)
         @interface Option {
 
@@ -91,6 +94,7 @@ public abstract class ProtoFileV2 {
             String value(); //<The value for the option.
         }
 
+        @Retention(RetentionPolicy.SOURCE)
         @Target(ElementType.TYPE)
         @interface Message {
 
@@ -98,9 +102,12 @@ public abstract class ProtoFileV2 {
 
             String comment() default ""; //<Comment for message.
 
+            boolean parallel() default false;
+
             /**
              * @brief Describes the properties of a field inside a message.
              */
+            @Retention(RetentionPolicy.SOURCE)
             @Target(ElementType.FIELD)
             @interface Field {
 
@@ -213,6 +220,7 @@ public abstract class ProtoFileV2 {
                 /**
                  * @brief A field option
                  */
+                @Retention(RetentionPolicy.SOURCE)
                 @Target(ElementType.FIELD)
                 @Repeatable(Options.class)
                 @interface Option {
@@ -225,6 +233,7 @@ public abstract class ProtoFileV2 {
                 /**
                  * @brief Field options container.
                  */
+                @Retention(RetentionPolicy.SOURCE)
                 @Target(ElementType.FIELD)
                 public @interface Options {
 
@@ -234,6 +243,7 @@ public abstract class ProtoFileV2 {
             }
         }
 
+        @Retention(RetentionPolicy.SOURCE)
         @Target(ElementType.TYPE)
         @interface Enum {
 
@@ -242,7 +252,7 @@ public abstract class ProtoFileV2 {
 
     }
 
-    @Retention(RetentionPolicy.CLASS)
+    @Retention(RetentionPolicy.SOURCE)
     @Target(ElementType.TYPE)
     public static @interface Serialize {
 

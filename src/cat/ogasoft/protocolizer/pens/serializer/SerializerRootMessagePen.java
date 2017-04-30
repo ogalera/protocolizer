@@ -29,8 +29,8 @@ public class SerializerRootMessagePen extends Pen {
         return new SerializerRootMessagePen(sJavaClass, sJavaFQN, builders);
     }
 
-    public SerializerMessagePen newMessage(String sJavaClass, String mJavaFQN, String pJavaClass) {
-        SerializerMessagePen message = SerializerMessagePen.build(sJavaFQN, sJavaClass, mJavaFQN, pJavaClass, builders);
+    public SerializerMessagePen newMessage(String sJavaClass, String mJavaFQN, String pJavaClass, boolean parallel) {
+        SerializerMessagePen message = SerializerMessagePen.build(sJavaFQN, sJavaClass, mJavaFQN, pJavaClass, builders, parallel);
         messages.add(message);
         return message;
     }

@@ -67,7 +67,7 @@ public class GenerationPhase {
             if (pfMessage != null) {
                 String mJavaClass = innerElement.getSimpleName().toString();
                 String pJavaClass = nullOrEmptyToName(pfMessage.name(), innerElement);
-                MessagePen mp = filePen.messagePen(mJavaClass, pJavaClass);
+                MessagePen mp = filePen.messagePen(mJavaClass, pJavaClass, pfMessage.parallel());
                 mFQN2pFQN.put(mp.mJavaFQN, mp.pJavaFQN);
                 message(mp, innerElement, mFQN2pFQN);
             } else {
@@ -124,7 +124,7 @@ public class GenerationPhase {
                     if (pf != null) {
                         String mJavaClass = innerElement.getSimpleName().toString();
                         String pJavaClass = nullOrEmptyToName(pf.name(), innerElement);
-                        MessagePen messagePen = mp.messagePen(mJavaClass, pJavaClass);
+                        MessagePen messagePen = mp.messagePen(mJavaClass, pJavaClass, pf.parallel());
                         mFQN2pFQN.put(messagePen.mJavaFQN, messagePen.pJavaFQN);
                         message(messagePen, innerElement, mFQN2pFQN);
                     }

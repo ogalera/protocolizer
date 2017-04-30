@@ -77,7 +77,7 @@ public class Compartido {
         ADTABLET
     }
 
-    @ProtoFileV2.File.Message
+    @ProtoFileV2.File.Message(parallel = true)
     public static class Referencia {
 
         @ProtoFileV2.File.Message.Field

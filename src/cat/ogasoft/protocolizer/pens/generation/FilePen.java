@@ -80,8 +80,8 @@ public class FilePen extends Pen {
         return this;
     }
 
-    public MessagePen messagePen(String mJavaClass, String pJavaClass) {
-        MessagePen mp = MessagePen.build(fileDescriptor.mJavaFQN, mJavaClass, fileDescriptor.pJavaFQN, pJavaClass);
+    public MessagePen messagePen(String mJavaClass, String pJavaClass, boolean parallel) {
+        MessagePen mp = MessagePen.build(fileDescriptor.mJavaFQN, mJavaClass, fileDescriptor.pJavaFQN, pJavaClass, parallel);
         messages.add(mp);
         return mp;
     }

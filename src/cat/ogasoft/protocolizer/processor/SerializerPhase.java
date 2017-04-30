@@ -38,7 +38,7 @@ public class SerializerPhase {
             Iterator<MessagePen> messageIterador = filePen.messageIterator();
             while (messageIterador.hasNext()) {
                 MessagePen gMessagePen = messageIterador.next();
-                SerializerMessagePen sMessagePen = rootMessages.newMessage(gMessagePen.pJavaClass, gMessagePen.mJavaFQN, gMessagePen.pJavaClass);
+                SerializerMessagePen sMessagePen = rootMessages.newMessage(gMessagePen.pJavaClass, gMessagePen.mJavaFQN, gMessagePen.pJavaClass, gMessagePen.parallel);
                 sMessagePen.addMethod(gMessagePen.mJavaFQN, gMessagePen.pJavaClass, gMessagePen.pJavaFQN, gMessagePen.fieldIterator());
                 //For each message inside a message root.
                 serializeMessage(gMessagePen, sMessagePen, enumsNS);
@@ -59,7 +59,7 @@ public class SerializerPhase {
         while (messagesIterator.hasNext()) {
             //Each inner message is translated to public static method.
             MessagePen inMessage = messagesIterator.next();
-            SerializerMessagePen smp2 = smp.buildInn(inMessage.pJavaClass, inMessage.mJavaFQN, inMessage.pJavaClass);
+            SerializerMessagePen smp2 = smp.buildInn(inMessage.pJavaClass, inMessage.mJavaFQN, inMessage.pJavaClass, inMessage.parallel);
             smp2.addMethod(inMessage.mJavaFQN, inMessage.pJavaClass, inMessage.pJavaFQN, inMessage.fieldIterator());
             serializeMessage(inMessage, smp2, enumsNS);
         }

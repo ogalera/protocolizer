@@ -1,4 +1,4 @@
-//Protocolizer 30/04/2017 24:28:02
+//Protocolizer 30/04/2017 11:13:09
 //This class has been generated automatically, plase
 //DO NOT EDIT!
 //
@@ -7,7 +7,28 @@ package cat.ogasoft.protocolizer.serializers;
 
 public class CompartidoSerialized {
 
-    public static class Referencia {
+    public static class Referencia extends Thread implements cat.ogasoft.protocolizer.SerializerProtoWorker<cat.ogasoft.examples2.Compartido.Referencia> {
+
+        private byte[] bytes;
+        private cat.ogasoft.examples2.Compartido.Referencia container;
+
+        @Override
+        public void work(cat.ogasoft.examples2.Compartido.Referencia container) {
+            this.container = container;
+            super.setName("cat.ogasoft.protocolizer.serializers.CompartidoSerialized.ReferenciaWorker");
+            start();
+        }
+
+        @Override
+        public byte[] waitUntilEnd() throws InterruptedException {
+            this.join();
+            return bytes;
+        }
+
+        @Override
+        public void run() {
+            bytes = dump(container);
+        }
 
         public byte[] dump(cat.ogasoft.examples2.Compartido.Referencia target) {
             return buildReferencia(target).toByteArray();
