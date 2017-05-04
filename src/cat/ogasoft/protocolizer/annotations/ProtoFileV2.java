@@ -26,24 +26,26 @@ import java.lang.annotation.Target;
  * @author Oscar Galera i Alfaro
  * @date Mar 19, 2017 [2:22:03 PM]
  *
- * @brief Annotations thats represents a protoc file.
+ * @brief Functional class that contains Protocolizer annotations.
  */
 public abstract class ProtoFileV2 {
 
+    /**
+     * @brief Annotation for Protocol Buffer compiler.
+     */
     @Retention(RetentionPolicy.SOURCE)
     @Target(ElementType.TYPE)
     public static @interface Compiler {
 
-        boolean compile() default true;
+        boolean compile() default true; //<If the message must be compiled.
 
-        String command();
+        String command(); //<The Protocol buffer compiler path.
 
-        Language language() default Language.JAVA;
+        Language language() default Language.JAVA; //<Target language for compilation results.
 
         public static enum Language {
-            JAVA("--java_out"),
-            CPP("--cpp_out");
-            public final String option;
+            JAVA("--java_out");
+            public final String option; //<Option for compile language.
 
             private Language(String option) {
                 this.option = option;
@@ -52,39 +54,45 @@ public abstract class ProtoFileV2 {
         }
     }
 
+    /**
+     * @brief Annotation for a Protocol Buffer File.
+     */
     @Retention(RetentionPolicy.SOURCE)
     @Target(ElementType.TYPE)
     public static @interface File {
 
         String pJavaName(); //<The name of the Java calss generated after protoc compilation (pJavaClass).
 
-        String pJavaPackage() default "cat.ogasoft.protocolizer.messages"; //<The package thats will contains the messages of the protocol.
+        String pJavaPackage() default "cat.ogasoft.protocolizer.messages"; //<The package thats will contains protoc messages.
 
         boolean generateSource() default true; //<Indicates if the protoc must be created.
 
+        /**
+         * @brief Annotation to import another protoc file.
+         */
         @Retention(RetentionPolicy.SOURCE)
         @Target(ElementType.TYPE)
         @Repeatable(Imports.class)
         @interface Import {
 
             public static enum ACCESS {
-                NONE("none"),
-                WEAK("weak"),
-                PUBLIC("public");
-                private final String name;
+                NONE("none"), //WEAK("weak"),
+                //PUBLIC("public")
+                ;
+                private final String type; //<Text for import type.
 
                 private ACCESS(String name) {
-                    this.name = name;
+                    this.type = name;
                 }
 
                 public String getName() {
-                    return name;
+                    return type;
                 }
             }
 
-            ACCESS access() default ACCESS.NONE;
+            ACCESS access() default ACCESS.NONE; //<Import type.
 
-            Class<?> importClass(); //<Name of the import.
+            Class<?> importClass(); //<Imported message.
         }
 
         /**
@@ -104,20 +112,20 @@ public abstract class ProtoFileV2 {
         @Target(ElementType.TYPE)
         @interface Option {
 
-            String name(); //<The name of the option.
+            String name(); //<Option name.
 
-            String value(); //<The value for the option.
+            String value(); //<Option value.
         }
 
         @Retention(RetentionPolicy.SOURCE)
         @Target(ElementType.TYPE)
         @interface Message {
 
-            String name() default ""; //<Name of the message.
+            String name() default ""; //<Message name.
 
-            String comment() default ""; //<Comment for message.
+            String comment() default ""; //<Message comment.
 
-            boolean parallel() default false;
+            boolean parallel() default false; //<If this message must be dumpped in parallel. For this, root message must be annotated with Dumpper annotation.
 
             /**
              * @brief Describes the properties of a field inside a message.
@@ -130,8 +138,8 @@ public abstract class ProtoFileV2 {
                  * @brief Set of types allowed by protocol buffer v2.
                  */
                 public static enum DataType {
-                    CALCULATED(null, null, null),
-                    COMPOSED(null, null, "!= null"),
+                    CALCULATED(null, null, null), //<The type will be calculated.
+                    COMPOSED(null, null, "!= null"), //<Composed type.
                     DOUBLE("double", "Double", "!= 0.0"),
                     FLOAT("float", "Float", "!= 0.0"),
                     INT32("int", "Integer", "!= 0"),
@@ -148,9 +156,9 @@ public abstract class ProtoFileV2 {
                     STRING("String", null, "!= null"),
                     BYTES("ByteString", null, "!= null");
 
-                    public final String type;
-                    public final String classType;
-                    public final String cPositive;
+                    public final String type; //<Type name.
+                    public final String classType; //<Equivalent Java class.
+                    public final String cPositive; //<Comparation for non empty.
 
                     private DataType(String type, String classType, String cPositive) {
                         this.type = type;
@@ -158,12 +166,23 @@ public abstract class ProtoFileV2 {
                         this.cPositive = cPositive;
                     }
 
+                    /**
+                     * @pre type is valid.
+                     * @post type has been validated. If the type is not valid, exception is raised.
+                     * @param type to validate.
+                     */
                     public void validate(String type) throws Exception {
                         if (this.type != null && !this.type.equals(type) && !this.classType.equals(type)) {
                             throw new Exception("Type missmatch, me: " + type + ", his: " + this.type + " or " + this.classType);
                         }
                     }
 
+                    /**
+                     * @pre type is valid.
+                     * @post Returns a DataType equivalent to type.
+                     * @param type to calculate.
+                     * @return DataType equivalent to type.
+                     */
                     public static DataType calculate(String type) throws Exception {
                         if (type == null) {
                             return COMPOSED;
@@ -213,10 +232,10 @@ public abstract class ProtoFileV2 {
                  * @brief Set of field rules allowed by protocol buffer v2.
                  */
                 public static enum Label {
-                    REQUIRED("required"),
-                    OPTIONAL("optional"),
-                    REPEATED("repeated");
-                    public final String name;
+                    REQUIRED("required"), //<The field needs a value.
+                    OPTIONAL("optional"), //<The value for the field is optional.
+                    REPEATED("repeated"); //<The value for the field is a list of items.
+                    public final String name; //<Name for the label.
 
                     private Label(String name) {
                         this.name = name;
@@ -226,11 +245,11 @@ public abstract class ProtoFileV2 {
 
                 Label label() default Label.REQUIRED; //<Label of the field.
 
-                DataType type() default DataType.CALCULATED; //<The type of the field.
+                DataType type() default DataType.CALCULATED; //<Field type.
 
-                String name() default ""; //<Name of the field.
+                String name() default ""; //<Field name.
 
-                String comment() default ""; //<Comment for the field.
+                String comment() default ""; //<Field comment.
 
                 /**
                  * @brief A field option
@@ -258,6 +277,9 @@ public abstract class ProtoFileV2 {
             }
         }
 
+        /**
+         * @brief Enumeration type.
+         */
         @Retention(RetentionPolicy.SOURCE)
         @Target(ElementType.TYPE)
         @interface Enum {
@@ -267,29 +289,21 @@ public abstract class ProtoFileV2 {
 
     }
 
+    /**
+     * @brief Annotation for Serializer and/or Deserializer
+     */
     @Retention(RetentionPolicy.SOURCE)
     @Target(ElementType.TYPE)
     public static @interface Dumpper {
 
         public static enum DumpperTypes {
-            SERIALIZER,
-            DESERIALIZER,
-            BOTH;
+            SERIALIZER, //<Only serialize code will be generated [Java -> Protocol Buffer]
+            DESERIALIZER, //<Only deserialize code will be generated [Protocol Buffer -> Java]
+            BOTH; //<Serialize and Deserialize code will be generated.
         }
 
-        String root() default "src";
+        String root() default "src"; //<The root for generated source.
 
-        boolean parallel() default false;
-
-        DumpperTypes type() default DumpperTypes.BOTH;
-    }
-
-    public static enum AnnotationTypes {
-        Message,
-        Enum,
-        ProtoFileV2,
-        Import,
-        Option,
-        Field;
+        DumpperTypes type() default DumpperTypes.BOTH; //<Dumpper type.
     }
 }

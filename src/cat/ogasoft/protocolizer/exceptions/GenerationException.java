@@ -19,10 +19,15 @@ package cat.ogasoft.protocolizer.exceptions;
  * @author Oscar Galera i Alfaro
  * @date Apr 27, 2017 [4:37:11 PM]
  *
- * @brief DESCRIPTION
+ * @brief Exception that must be raised if there is any problem in Generation phase.
  */
 public class GenerationException extends Exception {
 
+    /**
+     * @pre --
+     * @post GenerationException has been created with message.
+     * @param message describing the generation error.
+     */
     public GenerationException(String message) {
         super("Exception in Generation phase, message: " + message);
     }

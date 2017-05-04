@@ -19,15 +19,21 @@ import cat.ogasoft.protocolizer.exceptions.DeserializationException;
 
 /**
  * @author Oscar Galera i Alfaro
- * @brief Interface for those class that can deserialize a Protocol Buffer Message message.
+ * @brief Interface for those class that can deserialize a Protocol Buffer Message to a Java object.
  */
 public interface DeserializerProtoWorker<T> {
 
     /**
-     * @pre Data is a valid Protocol Buffer message.
-     * @post 
+     * @pre Data is a valid serialized Protocol Buffer message.
+     * @post The serialization process has been started.
+     * @param data is the raw representation of the message.
      */
     public void work(byte[] data);
 
+    /**
+     * @pre work has been assigned
+     * @post actual thread is paused until the deserialization process ends.
+     * @return the java representation of the message.
+     */
     public T waitUntilEnd() throws InterruptedException, DeserializationException;
 }

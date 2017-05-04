@@ -18,11 +18,23 @@ package cat.ogasoft.protocolizer;
 /**
  * @author Oscar Galera i Alfaro
  *
+ * @brief Interface for those class that can serialize a Java class to a Protocol Buffer message.
  *
+ * @param <T> The java type which will be serialized.
  */
 public interface SerializerProtoWorker<T> {
 
-    public void work(T container);
+    /**
+    * @pre target has been instantiated.
+    * @post the serialization process has been started.
+    * @param target object to serialize.
+    */
+    public void work(T target);
 
+    /**
+    * @pre work has been assigned.
+    * @post actual thread is paused until the serializer process ends.
+    * @return raw representation of the Protocol buffer message.
+    */
     public byte[] waitUntilEnd() throws InterruptedException;
 }

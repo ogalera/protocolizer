@@ -29,16 +29,16 @@ import java.util.Map;
  */
 public class DumpperRootMessagePen extends Pen {
 
-    private final String sJavaFQN;
+    private final String javaFQN;
     private final List<SerializerMessagePen> serializerMessages;
     private final List<DeserializerMessagePen> deserializerMessages;
     private final Map<String, String> builders;
 
-    private DumpperRootMessagePen(String sJavaClass, String sJavaFQN, Map<String, String> builders) {
+    private DumpperRootMessagePen(String sJavaClass, String javaFQN, Map<String, String> builders) {
         super(0, "public class " + sJavaClass + " {", "}");
         this.serializerMessages = new LinkedList<>();
         this.deserializerMessages = new LinkedList<>();
-        this.sJavaFQN = sJavaFQN;
+        this.javaFQN = javaFQN;
         this.builders = builders;
     }
 
@@ -46,14 +46,32 @@ public class DumpperRootMessagePen extends Pen {
         return new DumpperRootMessagePen(sJavaClass, sJavaFQN, builders);
     }
 
-    public SerializerMessagePen serializerMessage(String sJavaClass, String mJavaFQN, String pJavaClass, boolean parallel) {
-        SerializerMessagePen message = SerializerMessagePen.build(sJavaFQN, sJavaClass, mJavaFQN, pJavaClass, builders, parallel);
+    public SerializerMessagePen serializerMessage(String sJavaClass,
+            String mJavaFQN,
+            String pJavaClass,
+            boolean parallel) {
+        SerializerMessagePen message = SerializerMessagePen.build(javaFQN,
+                sJavaClass,
+                mJavaFQN,
+                pJavaClass,
+                builders,
+                parallel);
         serializerMessages.add(message);
         return message;
     }
 
-    public DeserializerMessagePen deserializerMessage(String sJavaClass, String mJavaFQN, String pJavaClass, String pJavaFQN, boolean parallel) {
-        DeserializerMessagePen message = DeserializerMessagePen.build(sJavaFQN, sJavaClass, mJavaFQN, pJavaClass, pJavaFQN, builders, parallel);
+    public DeserializerMessagePen deserializerMessage(String dJavaClass,
+            String dJavaFQN,
+            String pJavaClass,
+            String pJavaFQN,
+            boolean parallel) {
+        DeserializerMessagePen message = DeserializerMessagePen.build(javaFQN,
+                dJavaClass,
+                dJavaFQN,
+                pJavaClass,
+                pJavaFQN,
+                builders,
+                parallel);
         deserializerMessages.add(message);
         return message;
     }
@@ -62,13 +80,17 @@ public class DumpperRootMessagePen extends Pen {
         return builders;
     }
 
-    public void constructSerializerMethods(Map<String, String> methodsNS, Map<String, String> enumsNS, Map<String, String> mFQN2pFQN) {
+    public void constructSerializerMethods(Map<String, String> methodsNS,
+            Map<String, String> enumsNS,
+            Map<String, String> mFQN2pFQN) {
         for (SerializerMessagePen smp : serializerMessages) {
             smp.constructMethods(methodsNS, enumsNS, mFQN2pFQN);
         }
     }
 
-    public void constructDeserializerMethods(Map<String, String> methodsNS, Map<String, String> enumsNS, Map<String, String> mFQN2pFQN) {
+    public void constructDeserializerMethods(Map<String, String> methodsNS,
+            Map<String, String> enumsNS,
+            Map<String, String> mFQN2pFQN) {
         for (DeserializerMessagePen smp : deserializerMessages) {
             smp.constructMethods(methodsNS, enumsNS, mFQN2pFQN);
         }
@@ -101,7 +123,7 @@ public class DumpperRootMessagePen extends Pen {
     public Iterator<String> serializerIterator() {
         return serializerContent().iterator();
     }
-    
+
     public Iterator<String> deserializerIterator() {
         return deserializerContent().iterator();
     }

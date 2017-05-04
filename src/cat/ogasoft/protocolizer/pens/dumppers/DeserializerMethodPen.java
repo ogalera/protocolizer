@@ -35,7 +35,7 @@ public class DeserializerMethodPen extends Pen {
 
     public DeserializerMethodPen(int level, String methodName, String mJavaFQN, String pJavaFQN, Iterator<MessagePen.Field> fields) {
         super(level, "public static " + mJavaFQN + " " + methodName + "(" + pJavaFQN + " target){", "}");
-        super.writeInnTabln(mJavaFQN + " result = new " + mJavaFQN + "();");
+        super.writeInnln(mJavaFQN + " result = new " + mJavaFQN + "();");
         this.fields = fields;
     }
 
@@ -55,13 +55,13 @@ public class DeserializerMethodPen extends Pen {
                         } else {
                             parameter = methodsNS.get(field.javaFQN) + "(target." + getGetterJava(field, field.javaName) + "())";
                         }
-                        super.writeInnTabln("result." + getSetterProto(field.protoName) + "(" + parameter + ");");
+                        super.writeInnln("result." + getSetterProto(field.protoName) + "(" + parameter + ");");
                     } else {
-                        super.writeInnTabln("result." + getSetterProto(field.protoName) + "(target." + getGetterJava(field, field.javaName) + "());");
+                        super.writeInnln("result." + getSetterProto(field.protoName) + "(target." + getGetterJava(field, field.javaName) + "());");
                     }
                     break;
                 case OPTIONAL:
-                    super.writeInnTabln("if(target." + getHasProto(field.protoName) + "()){");
+                    super.writeInnln("if(target." + getHasProto(field.protoName) + "()){");
                     if (field.type == DataType.COMPOSED) {
                         String parameter = enumsNS.get(field.javaFQN);
                         if (parameter != null) {
@@ -74,7 +74,7 @@ public class DeserializerMethodPen extends Pen {
                     } else {
                         super.writeInnInnTabln("result." + getSetterJava(field.javaName) + "(target." + getGetterProto(field.protoName) + "());");
                     }
-                    super.writeInnTabln("}");
+                    super.writeInnln("}");
                     break;
                 case REPEATED:
                     if (field.type == DataType.COMPOSED) {
@@ -83,7 +83,7 @@ public class DeserializerMethodPen extends Pen {
                         if (javaFQN.contains("<")) {
                             type = javaFQN.substring(javaFQN.indexOf('<') + 1, javaFQN.lastIndexOf('>'));
                         }
-                        super.writeInnTabln("if(target." + getListProto(field.protoName) + "() != null){");
+                        super.writeInnln("if(target." + getListProto(field.protoName) + "() != null){");
                         super.writeInnInnTabln("java.util.ArrayList<" + type + "> r = new java.util.ArrayList<>(target." + getCountProto((field.protoName)) + "());");
                         String parameter = enumsNS.get(type);
                         if (parameter != null) {
@@ -93,23 +93,23 @@ public class DeserializerMethodPen extends Pen {
                             super.writeInnInnTabln("for(" + mFQN2pFQN.get(type) + " k:target." + getListProto(field.protoName) + "()){");
                             parameter = methodsNS.get(type) + "(k)";
                         }
-                        super.writeInnInnInnTabln("r.add(" + parameter + ");");
+                        super.writeInnInnInnln("r.add(" + parameter + ");");
                         super.writeInnInnTabln("}");
                         super.writeInnInnTabln("result." + getSetterJava(field.javaName) + "(r);");
-                        super.writeInnTabln("}");
+                        super.writeInnln("}");
                     } else {
-                        super.writeInnTabln("{");
+                        super.writeInnln("{");
                         super.writeInnInnTabln("java.util.ArrayList<" + field.type.classType + "> r = new java.util.ArrayList<>(target." + getCountProto((field.protoName)) + "());");
                         super.writeInnInnTabln("for(" + field.type.classType + " k:target." + getListProto(field.protoName) + "()){");
-                        super.writeInnInnInnTabln("r.add(k);");
+                        super.writeInnInnInnln("r.add(k);");
                         super.writeInnInnTabln("}");
                         super.writeInnInnTabln("result." + getSetterJava(field.javaName) + "(r);");
-                        super.writeInnTabln("}");
+                        super.writeInnln("}");
                     }
                     break;
             }
         }
-        super.writeInnTabln("return result;");
+        super.writeInnln("return result;");
         return this;
     }
 

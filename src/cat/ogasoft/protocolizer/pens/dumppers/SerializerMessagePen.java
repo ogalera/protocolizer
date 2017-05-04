@@ -39,31 +39,31 @@ public class SerializerMessagePen extends Pen {
         //For each protoc message, we have a public static class...
         super(level, "public static class " + sJavaClass + (parallel ? " extends Thread implements cat.ogasoft.protocolizer.SerializerProtoWorker<" + mJavaFQN + ">" : "") + " {", "}");
         if (parallel) {
-            super.writeInnTabln("private byte[] bytes;");
-            super.writeInnTabln("private " + mJavaFQN + " container;");
+            super.writeInnln("private byte[] bytes;");
+            super.writeInnln("private " + mJavaFQN + " container;");
             super.newLine();
             super.newLine();
-            super.writeInnTabln("@Override");
-            super.writeInnTabln("public void work(" + mJavaFQN + " container) {");
+            super.writeInnln("@Override");
+            super.writeInnln("public void work(" + mJavaFQN + " container) {");
             super.writeInnInnTabln("this.container = container;");
             super.writeInnInnTabln("super.setName(\"" + sJavaFQN + "Worker\");");
             super.writeInnInnTabln("start();");
-            super.writeInnTabln("}");
+            super.writeInnln("}");
             super.newLine();
-            super.writeInnTabln("@Override");
-            super.writeInnTabln("public byte[] waitUntilEnd() throws InterruptedException {");
+            super.writeInnln("@Override");
+            super.writeInnln("public byte[] waitUntilEnd() throws InterruptedException {");
             super.writeInnInnTabln("this.join();");
             super.writeInnInnTabln("return bytes;");
-            super.writeInnTabln("}");
+            super.writeInnln("}");
             super.newLine();
-            super.writeInnTabln("@Override");
-            super.writeInnTabln("public void run() {");
+            super.writeInnln("@Override");
+            super.writeInnln("public void run() {");
             super.writeInnInnTabln("bytes = dump(container);");
-            super.writeInnTabln("}");
+            super.writeInnln("}");
         }
-        super.writeInnTabln("public byte[] dump(" + mJavaFQN + " target){");
+        super.writeInnln("public byte[] dump(" + mJavaFQN + " target){");
         super.writeInnInnTabln("return build" + pJavaClass + "(target).toByteArray();");
-        super.writeInnTabln("}");
+        super.writeInnln("}");
         this.methods = new LinkedList<>();
         this.messages = new LinkedList<>();
         this.builders = builders;

@@ -26,54 +26,74 @@ import java.util.Map;
  * @author Oscar Galera i Alfaro
  * @date Apr 23, 2017 [10:07:54 PM]
  *
- * @brief DESCRIPTION
+ * @brief A pen to write deserialize protoc messages.
  */
 public class DeserializerMessagePen extends Pen {
 
-    private final List<DeserializerMessagePen> messages;
+    private final List<DeserializerMessagePen> messages; //<Nested messages.
     private final Map<String, String> builders;
-    private final String dJavaFQN;
-    private final String pJavaFQN;
-    private final List<DeserializerMethodPen> methods;
+    private final String dJavaFQN; //<deserialize Java FQN
+    private final String pJavaFQN; //<Protocol buffer java FQN.
+    private final List<DeserializerMethodPen> methods; //<Nested methods to deserialize nested messages.
 
-    private DeserializerMessagePen(int level, String sJavaClass, String dJavaFQN, String mJavaFQN, String pJavaClass, String pJavaFQN, Map<String, String> builders, boolean parallel) {
+    /**
+     * @pre level >= 0
+     * @post New deserialize message pen has been created.
+     * @param level for DMP.
+     * @param dJavaClass for DMP.
+     * @param dJavaFQN for  DMP.
+     * @param mJavaFQN for DMP.
+     * @param pJavaClass for DMP.
+     * @param pJavaFQN for DMP.
+     * @param builders map from mJavaFQN to his deserialize method FQN.
+     * @param parallel if the deserialization must be done in parallel.
+     */
+    private DeserializerMessagePen(int level,
+            String dJavaClass,
+            String dJavaFQN,
+            String mJavaFQN,
+            String pJavaClass,
+            String pJavaFQN,
+            Map<String, String> builders,
+            boolean parallel) {
         //For each protoc message, we have a public static class...
-        super(level, "public static class " + sJavaClass + (parallel ? " extends Thread implements cat.ogasoft.protocolizer.DeserializerProtoWorker<" + mJavaFQN + ">" : "") + " {", "}");
+        super(level, "public static class " + dJavaClass + (parallel ? " extends Thread implements cat.ogasoft.protocolizer.DeserializerProtoWorker<" + mJavaFQN + ">" : "") + " {", "}");
         if (parallel) {
-            super.writeInnTabln("private byte[] bytes;");
-            super.writeInnTabln("private " + mJavaFQN + " container;");
-            super.writeInnTabln("private String errMsg;");
+            super.writeInnln("private byte[] bytes;");
+            super.writeInnln("private " + mJavaFQN + " container;");
+            super.writeInnln("private String errMsg;");
             super.newLine();
             super.newLine();
-            super.writeInnTabln("@Override");
-            super.writeInnTabln("public void work(byte[] bytes) {");
+            super.writeInnln("@Override");
+            super.writeInnln("public void work(byte[] bytes) {");
             super.writeInnInnTabln("super.setName(\"" + dJavaFQN + "Worker\");");
             super.writeInnInnTabln("this.bytes = bytes;");
             super.writeInnInnTabln("start();");
-            super.writeInnTabln("}");
+            super.writeInnln("}");
             super.newLine();
-            super.writeInnTabln("@Override");
-            super.writeInnTabln("public " + mJavaFQN + " waitUntilEnd() throws InterruptedException,cat.ogasoft.protocolizer.exceptions.DeserializationException {");
+            super.writeInnln("@Override");
+            super.writeInnln("public " + mJavaFQN + " waitUntilEnd() throws InterruptedException,cat.ogasoft.protocolizer.exceptions.DeserializationException {");
             super.writeInnInnTabln("this.join();");
             super.writeInnInnTabln("if(container == null){");
-            super.writeInnInnInnTabln("throw new cat.ogasoft.protocolizer.exceptions.DeserializationException(\"Deserialization exception, message [\" + errMsg + \"]\");");
+            super.writeInnInnInnln("throw new cat.ogasoft.protocolizer.exceptions.DeserializationException(\"Deserialization exception, message [\" + errMsg + \"]\");");
             super.writeInnInnTabln("}");
             super.writeInnInnTabln("return container;");
-            super.writeInnTabln("}");
+            super.writeInnln("}");
             super.newLine();
-            super.writeInnTabln("@Override");
-            super.writeInnTabln("public void run() {");
+            super.writeInnln("@Override");
+            super.writeInnln("public void run() {");
             super.writeInnInnTabln("try{");
-            super.writeInnInnInnTabln("container = dump(bytes);");
+            super.writeInnInnInnln("container = dump(bytes);");
             super.writeInnInnTabln("} catch (com.google.protobuf.InvalidProtocolBufferException e) {");
-            super.writeInnInnInnTabln("errMsg = e.getMessage();");
+            super.writeInnInnInnln("errMsg = e.getMessage();");
             super.writeInnInnTabln("}");
-            super.writeInnTabln("}");
+            super.writeInnln("}");
         }
-        super.writeInnTabln("public " + mJavaFQN + " dump(byte[] target) throws com.google.protobuf.InvalidProtocolBufferException {");
+        super.writeInnln("public " + mJavaFQN + " dump(byte[] target) throws com.google.protobuf.InvalidProtocolBufferException {");
         super.writeInnInnTabln(pJavaFQN + " result = " + pJavaFQN + ".parseFrom(target);");
         super.writeInnInnTabln("return build" + pJavaClass + "(result);");
-        super.writeInnTabln("}");
+        super.writeInnln("}");
+        super.newLine();
         this.methods = new LinkedList<>();
         this.messages = new LinkedList<>();
         this.builders = builders;
@@ -81,20 +101,72 @@ public class DeserializerMessagePen extends Pen {
         this.pJavaFQN = pJavaFQN;
     }
 
-    public static DeserializerMessagePen build(String sJavaPackage, String sJavaClass, String mJavaFQN, String pJavaClass, String pJavaFQN, Map<String, String> builders, boolean parallel) {
-        String sJavaFQN = sJavaPackage + '.' + sJavaClass;
-        DeserializerMessagePen pen = new DeserializerMessagePen(1, sJavaClass, sJavaFQN, mJavaFQN, pJavaClass, pJavaFQN, builders, parallel);
+    /**
+     * @pre level >= 0
+     * @post New root deserializer message pen has been created.
+     * @param dJavaPackage for DMP.
+     * @param dJavaClass for DMP.
+     * @param mJavaFQN for DMP.
+     * @param pJavaClass for DMP.
+     * @param pJavaFQN for DMP.
+     * @param builders map from mJavaFQN to his deserialize method FQN.
+     * @param parallel if the deserialization must be done in parallel.
+     */
+    public static DeserializerMessagePen build(String dJavaPackage,
+            String dJavaClass,
+            String mJavaFQN,
+            String pJavaClass,
+            String pJavaFQN,
+            Map<String, String> builders,
+            boolean parallel) {
+        String sJavaFQN = dJavaPackage + '.' + dJavaClass;
+        DeserializerMessagePen pen = new DeserializerMessagePen(1,
+                dJavaClass,
+                sJavaFQN,
+                mJavaFQN,
+                pJavaClass,
+                pJavaFQN,
+                builders,
+                parallel);
         return pen;
     }
 
-    public DeserializerMessagePen buildInn(String dJavaClass, String mJavaFQN, String pJavaClass, boolean parallel) {
-        String sJavaFQNtmp = this.dJavaFQN + '.' + dJavaClass;
-        DeserializerMessagePen pen = new DeserializerMessagePen(level + 1, dJavaClass, sJavaFQNtmp, mJavaFQN, pJavaClass, pJavaFQN + '.' + pJavaClass, builders, parallel);
+    /**
+     * @pre --
+     * @post New nested deserializer message pen has been created.
+     * @param mJavaFQN for DMP.
+     * @param dJavaClass for DMP.
+     * @param pJavaClass for DMP.
+     * @param parallel if the deserialization must be done in parallel.
+     * @return New nested deserializer message pen.
+     */
+    public DeserializerMessagePen buildInn(String dJavaClass,
+            String mJavaFQN,
+            String pJavaClass,
+            boolean parallel) {
+        DeserializerMessagePen pen = new DeserializerMessagePen(level + 1,
+                dJavaClass,
+                this.dJavaFQN + '.' + dJavaClass,
+                mJavaFQN,
+                pJavaClass,
+                pJavaFQN + '.' + pJavaClass,
+                builders,
+                parallel);
         this.messages.add(pen);
         return pen;
     }
 
-    public DeserializerMethodPen addMethod(String mJavaFQN, String pJavaClass, String pJavaFQN, Iterator<MessagePen.Field> fields) throws Exception {
+    /**
+     * @pre --
+     * @post New nested deserializer message pen has been created.
+     * @param mJavaFQN for DMP.
+     * @param pJavaClass for DMP.
+     * @return New nested deserializer message pen.
+     */
+    public DeserializerMethodPen addMethod(String mJavaFQN,
+            String pJavaClass,
+            String pJavaFQN,
+            Iterator<MessagePen.Field> fields) throws Exception {
         if (builders.containsKey(mJavaFQN)) {
             throw new Exception("Ja existeix un metode que retorna " + mJavaFQN);
         }

@@ -23,26 +23,38 @@ import java.util.List;
  * @author Oscar Galera i Alfaro
  * @date Apr 20, 2017 [8:58:10 PM]
  *
- * @brief Generic pen
+ * @brief Generic pen for write java source.
  */
 public class Pen {
 
-    public final int level;
-    private final String tab;
-    private final String innerTab;
-    private final String innerInnerTab;
-    private final String innerInnerInnerTab;
-    private final String innerInnerInnerInnerTab;
-    private final List<String> lines;
-    private String begin;
-    private String end;
+    public final int level; //<Nested level.
+    private final String tab; //<Tab for this level.
+    private final String innerTab; //<Tab for next level.
+    private final String innerInnerTab; //<Tab for innerTab next level.
+    private final String innerInnerInnerTab; //<Tab for innerInnerTab next level.
+    private final String innerInnerInnerInnerTab; //<Tab for innerInnerInnerTab next level
+    private final List<String> lines; //<Java lines.
+    private String header; //<Source header.
+    private String footer;//<Source footer
 
-    public Pen(int level, String begin, String end) {
+    /**
+     * @pre level >= 0
+     * @post generates a java pen based on parameters.
+     * @param level nested for source.
+     * @param header source.
+     * @param footer source.
+     */
+    public Pen(int level, String header, String footer) {
         this(level);
-        this.begin = begin;
-        this.end = end;
+        this.header = header;
+        this.footer = footer;
     }
 
+    /**
+     * @pre level >= 0
+     * @post generates a java pen without header and footer
+     * @param level nested for source.
+     */
     public Pen(int level) {
         this.level = level;
         tab = tabs(level);
@@ -53,6 +65,10 @@ public class Pen {
         this.lines = new LinkedList<>();
     }
 
+    /**
+     * @pre level >= 0
+     * @post returns a string thats represents nested level.
+     */
     private String tabs(int level) {
         StringBuilder tabs = new StringBuilder();
         for (int i = 0; i < level; i++) {
@@ -61,79 +77,147 @@ public class Pen {
         return tabs.toString();
     }
 
-    public void writeInnTabln(String line) {
-        writeInnln(line);
+    /**
+     * @pre --
+     * @post writes a new line in next nested level and jumps
+     */
+    public void writeInnln(String line) {
+        writeInn(line);
         newLine();
     }
 
-    public void writeInnln(String line) {
+    /**
+     * @pre --
+     * @post writes a new line in next nested level.
+     */
+    public void writeInn(String line) {
         lines.add(innerTab + line);
     }
 
+    /**
+     * @pre --
+     * @post writes a new line in 2 next nested level and jumps.
+     */
     public void writeInnInnTabln(String line) {
-        writeInnInnln(line);
+        writeInnInn(line);
         newLine();
     }
 
-    public void writeInnInnln(String line) {
+    /**
+     * @pre --
+     * @post writes a new line in 2 next nested level.
+     */
+    public void writeInnInn(String line) {
         lines.add(innerInnerTab + line);
     }
 
-    public void writeInnInnInnTabln(String line) {
-        writeInnInnInnln(line);
+    /**
+     * @pre --
+     * @post writes a new line in 3 next nested level and jumps.
+     */
+    public void writeInnInnInnln(String line) {
+        writeInnInnInn(line);
         newLine();
     }
 
-    public void writeInnInnInnln(String line) {
+    /**
+     * @pre --
+     * @post writes a new line in 3 next nested level.
+     */
+    public void writeInnInnInn(String line) {
         lines.add(innerInnerInnerTab + line);
     }
 
-    public void writeInnInnInnInnTabln(String line) {
-        writeInnInnInnInnln(line);
+    /**
+     * @pre --
+     * @post writes a new line in 4 next nested level and jumps.
+     */
+    public void writeInnInnInnInnln(String line) {
+        writeInnInnInnInn(line);
         newLine();
     }
 
-    public void writeInnInnInnInnln(String line) {
+    /**
+     * @pre --
+     * @post writes a new line in 4 next nested level.
+     */
+    public void writeInnInnInnInn(String line) {
         lines.add(innerInnerInnerInnerTab + line);
     }
 
-    public void writeTabln(String line) {
-        writeTab(line);
-        newLine();
-    }
-
-    public void writeTab(String line) {
-        lines.add(tab + line);
-    }
-
+    /**
+     * @pre --
+     * @post writes a new line and jumps.
+     */
     public void writeln(String line) {
         write(line);
         newLine();
     }
 
+    /**
+     * @pre --
+     * @post writes a new line.
+     */
     public void write(String line) {
+        lines.add(tab + line);
+    }
+
+    /**
+     * @pre --
+     * @post writes a new line without level tab and jumps.
+     */
+    public void writeNoTabln(String line) {
+        writeNoTab(line);
+        newLine();
+    }
+
+    /**
+     * @pre --
+     * @post writes a new line without level tab.
+     */
+    public void writeNoTab(String line) {
         lines.add(line);
     }
 
+    /**
+     * @pre --
+     * @post jumps.
+     */
     public void newLine() {
         lines.add("\n");
     }
 
+    /**
+     * @pre --
+     * @post returns an iterator through lines (without header and footer).
+     */
     public Iterator<String> iterator() {
         return lines.iterator();
     }
 
-    public void addBegin(List<String> target) {
-        target.add(tab + begin);
-        target.add("\n");
+    /**
+     * @pre target is not null
+     * @post add the header to container.
+     */
+    public void addBegin(List<String> container) {
+        container.add(tab + header);
+        container.add("\n");
     }
 
-    public void addContent(List<String> target) {
-        target.addAll(lines);
+    /**
+     * @pre target is not null.
+     * @post adds lines in container.
+     */
+    public void addContent(List<String> container) {
+        container.addAll(lines);
     }
 
-    public void addEnd(List<String> target) {
-        target.add(tab + end);
-        target.add("\n");
+    /**
+     * @pre target is not null
+     * @post add the footer in container.
+     */
+    public void addEnd(List<String> container) {
+        container.add(tab + footer);
+        container.add("\n");
     }
 }

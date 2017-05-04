@@ -35,7 +35,7 @@ public class SerializerMethodPen extends Pen {
 
     public SerializerMethodPen(int level, String methodName, String mJavaFQN, String pJavaFQN, Iterator<MessagePen.Field> fields) {
         super(level, "public static " + pJavaFQN + " " + methodName + "(" + mJavaFQN + " target){", "}");
-        super.writeInnTabln(pJavaFQN + ".Builder builder = " + pJavaFQN + ".newBuilder();");
+        super.writeInnln(pJavaFQN + ".Builder builder = " + pJavaFQN + ".newBuilder();");
         this.fields = fields;
     }
 
@@ -55,13 +55,13 @@ public class SerializerMethodPen extends Pen {
                         } else {
                             parameter = methodsNS.get(mFQN2pFQN.get(field.javaFQN)) + "(target." + getGetterJava(field, field.javaName) + "())";
                         }
-                        super.writeInnTabln("builder." + getSetterProto(field.protoName) + "(" + parameter + ");");
+                        super.writeInnln("builder." + getSetterProto(field.protoName) + "(" + parameter + ");");
                     } else {
-                        super.writeInnTabln("builder." + getSetterProto(field.protoName) + "(target." + getGetterJava(field, field.javaName) + "());");
+                        super.writeInnln("builder." + getSetterProto(field.protoName) + "(target." + getGetterJava(field, field.javaName) + "());");
                     }
                     break;
                 case OPTIONAL:
-                    super.writeInnTabln("if(target." + getGetterJava(field, field.javaName) + "() " + field.type.cPositive + "){");
+                    super.writeInnln("if(target." + getGetterJava(field, field.javaName) + "() " + field.type.cPositive + "){");
                     if (field.type == DataType.COMPOSED) {
                         String parameter = enumsNS.get(field.javaFQN);
                         if (parameter != null) {
@@ -73,10 +73,10 @@ public class SerializerMethodPen extends Pen {
                     } else {
                         super.writeInnInnTabln("builder." + getSetterProto(field.protoName) + "(target." + getGetterJava(field, field.javaName) + "());");
                     }
-                    super.writeInnTabln("}");
+                    super.writeInnln("}");
                     break;
                 case REPEATED:
-                    super.writeInnTabln("if(target." + getGetterJava(field, field.javaName) + "() != null){");
+                    super.writeInnln("if(target." + getGetterJava(field, field.javaName) + "() != null){");
                     if (field.type == DataType.COMPOSED) {
                         String javaFQN = field.javaFQN;
                         String type = javaFQN;
@@ -84,26 +84,26 @@ public class SerializerMethodPen extends Pen {
                             type = javaFQN.substring(javaFQN.indexOf('<') + 1, javaFQN.lastIndexOf('>'));
                         }
                         super.writeInnInnTabln("if(target." + getGetterJava(field, field.javaName) + "() != null){");
-                        super.writeInnInnInnTabln("for(" + type + " k:target." + getGetterJava(field, field.javaName) + "()){");
+                        super.writeInnInnInnln("for(" + type + " k:target." + getGetterJava(field, field.javaName) + "()){");
                         String parameter = enumsNS.get(type);
                         if (parameter != null) {
                             parameter += ".valueOf(k.name())";
                         } else {
                             parameter = methodsNS.get(mFQN2pFQN.get(type)) + "(k)";
                         }
-                        super.writeInnInnInnInnTabln("builder." + getAdderProto(field.protoName) + "(" + parameter + ");");
-                        super.writeInnInnInnTabln("}");
+                        super.writeInnInnInnInnln("builder." + getAdderProto(field.protoName) + "(" + parameter + ");");
+                        super.writeInnInnInnln("}");
                         super.writeInnInnTabln("}");
                     } else {
                         super.writeInnInnTabln("for(" + field.type.classType + " k:target." + getGetterJava(field, field.javaName) + "()){");
-                        super.writeInnInnInnTabln("builder." + getAdderProto(field.protoName) + "(k);");
+                        super.writeInnInnInnln("builder." + getAdderProto(field.protoName) + "(k);");
                         super.writeInnInnTabln("}");
                     }
-                    super.writeInnTabln("}");
+                    super.writeInnln("}");
                     break;
             }
         }
-        super.writeInnTabln("return builder.build();");
+        super.writeInnln("return builder.build();");
         return this;
     }
 

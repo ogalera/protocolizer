@@ -23,19 +23,32 @@ import java.util.List;
  * @author Oscar Galera i Alfaro
  * @date Apr 20, 2017 [9:50:18 PM]
  *
- * @brief DESCRIPTION
+ * @brief A pen to write a new Protocol Buffer enumesration.
  */
 public class EnumPen extends Pen {
 
-    private int ids; //<Identifier for each enum value;
-    public final String mJavaPackage;
-    public final String mJavaClass;
-    public final String mJavaFQN;
-    public final String pJavaPackage;
-    public final String pJavaClass;
-    public final String pJavaFQN;
+    private int ids; //<Identifier counter for each enum value;
+    public final String mJavaPackage; //<Message Java package.
+    public final String mJavaClass; //<Message Java name.
+    public final String mJavaFQN; //<Message Java FQN (mJavaPackage.mJavaClass).
+    public final String pJavaPackage; //<Protocol buffer message package.
+    public final String pJavaClass;//<Protocol buffer message name.
+    public final String pJavaFQN;//<Protocol buffer message FQN (pJavaPackage.pJavaClass).
 
-    private EnumPen(int level, String mJavaPackage, String mJavaClass, String pJavaPackage, String pJavaClass) {
+    /**
+     * @pre level >= 0
+     * @post new EnumPen has been generated.
+     * @param level for enumeration.
+     * @param mJavaPackage enumeration java package.
+     * @param mJavaClass enumeration java name.
+     * @param pJavaPackage Protocol buffer enumeration package.
+     * @param pJavaClass Protocol buffer enumeration message.
+     */
+    private EnumPen(int level,
+            String mJavaPackage,
+            String mJavaClass,
+            String pJavaPackage,
+            String pJavaClass) {
         super(level, "enum " + pJavaClass + " {", "}");
         this.mJavaPackage = mJavaPackage;
         this.mJavaClass = mJavaClass;
@@ -46,12 +59,29 @@ public class EnumPen extends Pen {
         this.ids = 0;
     }
 
-    public static EnumPen build(int level, String mJavaPackage, String mJavaClass, String pJavaPackage, String pJavaClass) {
+    /**
+     * @pre level >= 0
+     * @post new EnumPen has been generated.
+     * @param level for enumeration.
+     * @param mJavaPackage enumeration java package.
+     * @param mJavaClass enumeration java name.
+     * @param pJavaPackage Protocol buffer enumeration package.
+     * @param pJavaClass Protocol buffer enumeration message.
+     */
+    public static EnumPen build(int level,
+            String mJavaPackage,
+            String mJavaClass,
+            String pJavaPackage,
+            String pJavaClass) {
         return new EnumPen(level, mJavaPackage, mJavaClass, pJavaPackage, pJavaClass);
     }
-    
+
+    /**
+     * @pre --
+     * @post new enumeration value has been added.
+     */
     public EnumPen addValue(String value) {
-        super.writeInnTabln(value + " = " + (ids++) + ";");
+        super.writeInnln(value + " = " + (ids++) + ";");
         return this;
     }
 

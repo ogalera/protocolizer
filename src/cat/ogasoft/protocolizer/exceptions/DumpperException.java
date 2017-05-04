@@ -19,10 +19,15 @@ package cat.ogasoft.protocolizer.exceptions;
  * @author Oscar Galera i Alfaro
  * @date Apr 27, 2017 [5:14:45 PM]
  *
- * @brief DESCRIPTION
+ * @brief Exception that must be raised if there is any problem in Dumpper phase.
  */
 public class DumpperException extends Exception {
 
+    /**
+     * @pre --
+     * @post DeserializationException has been created with message.
+     * @param message describing the dumpper error.
+     */
     public DumpperException(String message) {
         super("Exception in Serialization phase, message: " + message);
     }

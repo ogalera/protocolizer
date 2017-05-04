@@ -40,13 +40,13 @@ public class DumpperFilePen extends Pen {
 
     private DumpperFilePen(File fileDump, FileDescriptor fileDescriptor) {
         super(0);
-        super.writeln("//Protocolizer " + new SimpleDateFormat("dd/MM/yyyy kk:mm:ss").format(new Date()));
-        super.writeln("//This class has been generated automatically, plase");
-        super.writeln("//DO NOT EDIT!");
-        super.writeln("//");
-        super.writeln("//For any question, feel free to contact me at: oscar.galeraa@gmail.com");
+        super.writeNoTabln("//Protocolizer " + new SimpleDateFormat("dd/MM/yyyy kk:mm:ss").format(new Date()));
+        super.writeNoTabln("//This class has been generated automatically, plase");
+        super.writeNoTabln("//DO NOT EDIT!");
+        super.writeNoTabln("//");
+        super.writeNoTabln("//For any question, feel free to contact me at: oscar.galeraa@gmail.com");
         super.newLine();
-        super.writeln("package " + fileDescriptor.sJavaPackage + ";");
+        super.writeNoTabln("package " + fileDescriptor.sJavaPackage + ";");
         super.newLine();
         super.newLine();
         this.fileDescriptor = fileDescriptor;
@@ -54,7 +54,7 @@ public class DumpperFilePen extends Pen {
     }
 
     public DumpperFilePen addComment(String line) {
-        super.writeln("//" + line);
+        super.writeNoTabln("//" + line);
         return this;
     }
 

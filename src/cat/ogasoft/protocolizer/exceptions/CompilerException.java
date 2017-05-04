@@ -19,12 +19,17 @@ package cat.ogasoft.protocolizer.exceptions;
  * @author Oscar Galera i Alfaro
  * @date   Apr 27, 2017 [5:14:34 PM]
  *
- * @brief DESCRIPTION
+ * @brief Exception that must be raised if there is any problem in Compiler phase.
  */
-public class CompilerException extends Exception{
+public class CompilerException extends Exception {
 
+    /**
+     * @pre --
+     * @post CompilerException has been created with message.
+     * @param message describing the compiler error.
+     */
     public CompilerException(String message) {
-        super("Exception in Compiler phase, message: "+message);
+        super("Exception in Compiler phase, message: " + message);
     }
 
 }
