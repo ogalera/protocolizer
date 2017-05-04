@@ -1,2 +1,9 @@
 /dist/
 /examples/dist/
+/build.xml
+/build/*
+/manifest.mf
+/nbproject/*
+/protobuf-3.2.0/*
+/protobuf-java-3.2.0.tar.gz
+/protos/*
