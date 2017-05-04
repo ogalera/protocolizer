@@ -3,8 +3,7 @@ Zero-overhead Java <-> Protocol Buffer automatizer, at roughly 133Kb, the librar
 
 -------------------------------------------------------------------
 
+##Description
 Write less and do more annotating Java classes that represents a protocol buffer message and left Protocolizer works for you. It's very simple.
 
-
-
-![](https://github.com/brettwooldridge/HikariCP/wiki/HikariCP-bench-2.6.0.png)
+![esquma](https://github.com/ogalera/protocolizer/blob/master/resources/esquema.png)
