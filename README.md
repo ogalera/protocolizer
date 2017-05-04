@@ -16,7 +16,7 @@ Note that this library only works at compile time, so your project will never ex
 -------------------------------------------------------------------
 ## Examples
 
-´´´Java
+```java
 @ProtoFileV2.File(pJavaName = "Example1")
 public class Example1 {
 
@@ -117,10 +117,11 @@ public class Example1 {
         }
     }
 }
-´´´
+```
 
 Generated Google Protocol Buffer message
-´´´protoc
+
+```proto
 option java_package = "cat.ogasoft.protocolizer.messages";
 
 option java_outer_classname = "Example1";
@@ -145,7 +146,7 @@ message Person {
 message AddressBook {
     required Person people = 1;
 }
-´´´
+```
 
 -------------------------------------------------------------------
 ## Installation
