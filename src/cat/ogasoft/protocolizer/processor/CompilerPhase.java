@@ -1,3 +1,18 @@
+/*
+ * Copyright 2017 Oscar Galera i Alfaro.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package cat.ogasoft.protocolizer.processor;
 
 import cat.ogasoft.protocolizer.annotations.ProtoFileV2;
@@ -13,14 +28,13 @@ import org.apache.commons.exec.DefaultExecutor;
  * @author Oscar Galera i Alfaro
  * @date Apr 27, 2017 [5:10:19 PM]
  *
- * @brief DESCRIPTION
+ * @brief Functional class for serialize and deserialize Google Protocol Buffer messages.
  */
 public class CompilerPhase {
-
+    
     public static void processCompiler(RoundEnvironment roundEnv) throws CompilerException {
         try {
-            char separator = File.separatorChar;
-            String protocPath = "src" + separator + "cat" + separator + "ogasoft" + separator + "protocolizer" + separator + "protoc";
+            String protocPath = "src" + File.separatorChar + "cat" + File.separatorChar + "ogasoft" + File.separatorChar + "protocolizer" + File.separatorChar + "protoc";
             for (Element element : roundEnv.getElementsAnnotatedWith(ProtoFileV2.Compiler.class)) {
                 ProtoFileV2.Compiler compiler = element.getAnnotation(ProtoFileV2.Compiler.class);
                 if (compiler.compile()) {
@@ -48,6 +62,7 @@ public class CompilerPhase {
                 }
             }
         } catch (Exception e) {
+            //Any exception is a CompilerException.
             throw new CompilerException(e.getMessage());
         }
     }
