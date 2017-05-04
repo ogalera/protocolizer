@@ -1,4 +1,4 @@
-<img style="width:50px;" src="https://github.com/ogalera/protocolizer/blob/master/resources/logo.png">
+<img src="https://github.com/ogalera/protocolizer/blob/master/resources/logo2.png">
 # Protocolizer
 **Zero-overhead Java <-> Protocol Buffer** automatizer, at roughly **133Kb**, the library is very light and only works in development pahse to obtain a single contact point with Protocol Buffer.
 
