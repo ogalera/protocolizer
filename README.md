@@ -1,5 +1,5 @@
 # Protocolizer
-Zero-overhead Java <-> Protocol Buffer automatizer, at roughly 133Kb, the library is very light and only works in development pahse to get a single contact point with Protocol Buffer.
+**Zero-overhead Java <-> Protocol Buffer** automatizer, at roughly 133Kb, the library is very light and only works in development pahse to get a single contact point with Protocol Buffer.
 
 -------------------------------------------------------------------
 
