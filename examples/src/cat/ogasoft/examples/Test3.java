@@ -24,8 +24,8 @@ import java.util.List;
  *
  * @brief DESCRIPTION
  */
-@ProtoFileV2.File(pJavaName = "prova2", generateSource = true)
-@ProtoFileV2.Dumpper
+//@ProtoFileV2.File(pJavaName = "prova2", generateSource = true)
+//@ProtoFileV2.Dumpper
 public class Test3 {
 
     @ProtoFileV2.File.Message

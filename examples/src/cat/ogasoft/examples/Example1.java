@@ -24,7 +24,8 @@ import java.util.List;
  *
  * @brief Very simple Protocolizer example.
  */
-@ProtoFileV2.File(pJavaName = "Example1")
+//@ProtoFileV2.File(pJavaName = "Example1")
+//@ProtoFileV2.Dumpper
 public class Example1 {
 
     @ProtoFileV2.File.Message
@@ -109,7 +110,7 @@ public class Example1 {
 
     }
 
-    @ProtoFileV2.File.Message
+    @ProtoFileV2.File.Message(parallel = true)
     public static class AddressBook {
 
         @ProtoFileV2.File.Message.Field

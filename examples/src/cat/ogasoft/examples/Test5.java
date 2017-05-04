@@ -23,9 +23,9 @@ import cat.ogasoft.protocolizer.annotations.ProtoFileV2;
  *
  * @brief DESCRIPTION
  */
-@ProtoFileV2.File(pJavaName = "prova7", generateSource = true)
-@ProtoFileV2.Dumpper
-@ProtoFileV2.File.Import(importClass = Test4.class)
+//@ProtoFileV2.File(pJavaName = "prova7", generateSource = true)
+//@ProtoFileV2.Dumpper
+//@ProtoFileV2.File.Import(importClass = Test4.class)
 public class Test5 {
 
     @ProtoFileV2.File.Message

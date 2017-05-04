@@ -28,7 +28,7 @@ import java.util.List;
 @ProtoFileV2.Dumpper
 public class Example {
 
-    @ProtoFileV2.File.Message(parallel = true)
+    @ProtoFileV2.File.Message
     public static class Person {
 
         @ProtoFileV2.File.Message.Field
@@ -110,7 +110,7 @@ public class Example {
 
     }
 
-    @ProtoFileV2.File.Message
+    @ProtoFileV2.File.Message(parallel = true)
     public static class AddressBook {
 
         @ProtoFileV2.File.Message.Field(label = ProtoFileV2.File.Message.Field.Label.REPEATED)

@@ -23,8 +23,8 @@ import cat.ogasoft.protocolizer.annotations.ProtoFileV2;
  *
  * @brief DESCRIPTION
  */
-@ProtoFileV2.File(pJavaName = "prova6", generateSource = true)
-@ProtoFileV2.Dumpper
+//@ProtoFileV2.File(pJavaName = "prova6", generateSource = true)
+//@ProtoFileV2.Dumpper
 public class Test4 {
 
     @ProtoFileV2.File.Message

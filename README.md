@@ -1,10 +1,10 @@
 # Protocolizer
-**Zero-overhead Java <-> Protocol Buffer** automatizer, at roughly 133Kb, the library is very light and only works in development pahse to get a single contact point with Protocol Buffer.
+**Zero-overhead Java <-> Protocol Buffer** automatizer, at roughly 133Kb, the library is very light and only works in development pahse to obtain a single contact point with Protocol Buffer.
 
 -------------------------------------------------------------------
 
 ## Description
-Write less and do more annotating POJO Java classes that represents a protocol buffer message and left Protocolizer works for you. It's very simple.
+Write less and do more **annotating POJO Java classes** that represents a protocol buffer message and left Protocolizer works for you. It's very simple.
 
 ### Structure
 ![esquma](https://github.com/ogalera/protocolizer/blob/master/resources/esquema.png)
@@ -18,8 +18,9 @@ Note that this library only works at compile time, so your project will never ex
 
 ### Your Java Message
 ```java
-@ProtoFileV2.File(pJavaName = "Example1")
-public class Example1 {
+@ProtoFileV2.File(pJavaName = "Example")
+@ProtoFileV2.Dumpper
+public class Example {
 
     @ProtoFileV2.File.Message
     public static class Person {
@@ -33,7 +34,7 @@ public class Example1 {
         @ProtoFileV2.File.Message.Field(label = ProtoFileV2.File.Message.Field.Label.OPTIONAL)
         private String email;
 
-        @ProtoFileV2.File.Message.Field
+        @ProtoFileV2.File.Message.Field(label = ProtoFileV2.File.Message.Field.Label.REPEATED)
         private List<PhoneNumber> phones;
 
         @ProtoFileV2.File.Enum
@@ -103,10 +104,10 @@ public class Example1 {
 
     }
 
-    @ProtoFileV2.File.Message
+    @ProtoFileV2.File.Message(parallel = true)
     public static class AddressBook {
 
-        @ProtoFileV2.File.Message.Field
+        @ProtoFileV2.File.Message.Field(label = ProtoFileV2.File.Message.Field.Label.REPEATED)
         private List<Person> people;
 
         public List<Person> getPeople() {
@@ -127,14 +128,14 @@ Generated **Google Protocol Buffer message**.
 ```proto
 option java_package = "cat.ogasoft.protocolizer.messages";
 
-option java_outer_classname = "Example1";
+option java_outer_classname = "Example";
 
 
 message Person {
     required string name = 1;
     required int32 id = 2;
     optional string email = 3;
-    required PhoneNumber phones = 4;
+    repeated PhoneNumber phones = 4;
     message PhoneNumber {
         required string number = 1;
         optional PhoneType type = 2;
@@ -147,7 +148,7 @@ message Person {
 }
 
 message AddressBook {
-    required Person people = 1;
+    repeated Person people = 1;
 }
 ```
 
@@ -160,28 +161,7 @@ package cat.ogasoft.protocolizer.dumppers.serializers;
 
 
 public class ExampleSerializer {
-    public static class Person extends Thread implements cat.ogasoft.protocolizer.SerializerProtoWorker<cat.ogasoft.examples.Example.Person> {
-        private byte[] bytes;
-        private cat.ogasoft.examples.Example.Person container;
-
-
-        @Override
-        public void work(cat.ogasoft.examples.Example.Person container) {
-            this.container = container;
-            super.setName("cat.ogasoft.protocolizer.dumppers.serializers.ExampleSerializer.PersonWorker");
-            start();
-        }
-
-        @Override
-        public byte[] waitUntilEnd() throws InterruptedException {
-            this.join();
-            return bytes;
-        }
-
-        @Override
-        public void run() {
-            bytes = dump(container);
-        }
+    public static class Person {
         public byte[] dump(cat.ogasoft.examples.Example.Person target){
             return buildPerson(target).toByteArray();
         }
@@ -216,7 +196,28 @@ public class ExampleSerializer {
         }
     }
 
-    public static class AddressBook {
+    public static class AddressBook extends Thread implements cat.ogasoft.protocolizer.SerializerProtoWorker<cat.ogasoft.examples.Example.AddressBook> {
+        private byte[] bytes;
+        private cat.ogasoft.examples.Example.AddressBook container;
+
+
+        @Override
+        public void work(cat.ogasoft.examples.Example.AddressBook container) {
+            this.container = container;
+            super.setName("cat.ogasoft.protocolizer.dumppers.serializers.ExampleSerializer.AddressBookWorker");
+            start();
+        }
+
+        @Override
+        public byte[] waitUntilEnd() throws InterruptedException {
+            this.join();
+            return bytes;
+        }
+
+        @Override
+        public void run() {
+            bytes = dump(container);
+        }
         public byte[] dump(cat.ogasoft.examples.Example.AddressBook target){
             return buildAddressBook(target).toByteArray();
         }
@@ -241,36 +242,7 @@ package cat.ogasoft.protocolizer.dumppers.deserializers;
 
 
 public class ExampleDeserializer {
-    public static class Person extends Thread implements cat.ogasoft.protocolizer.DeserializerProtoWorker<cat.ogasoft.examples.Example.Person> {
-        private byte[] bytes;
-        private cat.ogasoft.examples.Example.Person container;
-        private String errMsg;
-
-
-        @Override
-        public void work(byte[] bytes) {
-            super.setName("cat.ogasoft.protocolizer.dumppers.deserializers.ExampleDeserializer.PersonWorker");
-            this.bytes = bytes;
-            start();
-        }
-
-        @Override
-        public cat.ogasoft.examples.Example.Person waitUntilEnd() throws InterruptedException,cat.ogasoft.protocolizer.exceptions.DeserializationException {
-            this.join();
-            if(container == null){
-                throw new cat.ogasoft.protocolizer.exceptions.DeserializationException("Deserialization exception, message [" + errMsg + "]");
-            }
-            return container;
-        }
-
-        @Override
-        public void run() {
-            try{
-                container = dump(bytes);
-            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-                errMsg = e.getMessage();
-            }
-        }
+    public static class Person {
         public cat.ogasoft.examples.Example.Person dump(byte[] target) throws com.google.protobuf.InvalidProtocolBufferException {
             cat.ogasoft.protocolizer.messages.Example.Person result = cat.ogasoft.protocolizer.messages.Example.Person.parseFrom(target);
             return buildPerson(result);
@@ -309,7 +281,36 @@ public class ExampleDeserializer {
         }
     }
 
-    public static class AddressBook {
+    public static class AddressBook extends Thread implements cat.ogasoft.protocolizer.DeserializerProtoWorker<cat.ogasoft.examples.Example.AddressBook> {
+        private byte[] bytes;
+        private cat.ogasoft.examples.Example.AddressBook container;
+        private String errMsg;
+
+
+        @Override
+        public void work(byte[] bytes) {
+            super.setName("cat.ogasoft.protocolizer.dumppers.deserializers.ExampleDeserializer.AddressBookWorker");
+            this.bytes = bytes;
+            start();
+        }
+
+        @Override
+        public cat.ogasoft.examples.Example.AddressBook waitUntilEnd() throws InterruptedException,cat.ogasoft.protocolizer.exceptions.DeserializationException {
+            this.join();
+            if(container == null){
+                throw new cat.ogasoft.protocolizer.exceptions.DeserializationException("Deserialization exception, message [" + errMsg + "]");
+            }
+            return container;
+        }
+
+        @Override
+        public void run() {
+            try{
+                container = dump(bytes);
+            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+                errMsg = e.getMessage();
+            }
+        }
         public cat.ogasoft.examples.Example.AddressBook dump(byte[] target) throws com.google.protobuf.InvalidProtocolBufferException {
             cat.ogasoft.protocolizer.messages.Example.AddressBook result = cat.ogasoft.protocolizer.messages.Example.AddressBook.parseFrom(target);
             return buildAddressBook(result);
@@ -331,6 +332,66 @@ public class ExampleDeserializer {
 }
 ```
 
+### Parse message.
+Now, you only need write code for instantiate and fill your message. All the other are done.
+```java
+public class Parser {
+
+    public static void main(String... args) throws Exception {
+        Example.AddressBook message = generateMessage();
+        byte[] raw = sender(message);
+        System.out.println(Arrays.toString(raw));
+        receiver(raw);
+    }
+
+    private static Example.AddressBook generateMessage() {
+        List<Example.Person> people = new LinkedList<>();
+        Example.Person peter = new Example.Person();
+        peter.setId(1);
+        peter.setName("peter");
+        peter.setEmail("peter@protocolizer.com");
+        List<Example.Person.PhoneNumber> peterPhones = new LinkedList<>();
+        Example.Person.PhoneNumber pPeter = new Example.Person.PhoneNumber();
+        pPeter.setNumber("647658711");
+        pPeter.setType(Example.Person.PhoneType.MOBILE);
+        peterPhones.add(pPeter);
+        peter.setPhones(peterPhones);
+
+        Example.Person mark = new Example.Person();
+        mark.setId(2);
+        mark.setName("mark");
+        mark.setEmail("mark@protocolizer.com");
+        List<Example.Person.PhoneNumber> markPhones = new LinkedList<>();
+        Example.Person.PhoneNumber pMark = new Example.Person.PhoneNumber();
+        pMark.setNumber("+34 911454571");
+        pMark.setType(Example.Person.PhoneType.WORK);
+        markPhones.add(pMark);
+        mark.setPhones(markPhones);
+
+        people.add(peter);
+        people.add(mark);
+
+        Example.AddressBook addr = new Example.AddressBook();
+        addr.setPeople(people);
+        return addr;
+    }
+
+    private static byte[] sender(Example.AddressBook addr) throws Exception {
+
+        ExampleSerializer.AddressBook serializer = new ExampleSerializer.AddressBook();
+        serializer.work(addr);
+        return serializer.waitUntilEnd();
+    }
+
+    private static Example.AddressBook receiver(byte[] raw) throws Exception {
+        ExampleDeserializer.AddressBook deserializer = new ExampleDeserializer.AddressBook();
+        deserializer.work(raw);
+        return deserializer.waitUntilEnd();
+    }
+}
+```
+
+In resume, you only need write two java classes (Example1.java & Parser.java in this example). 
 -------------------------------------------------------------------
 ## Installation
 You only need **four very simple steps**.
