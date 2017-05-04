@@ -394,8 +394,19 @@ In resume, you only need write two java classes (Example1.java & Parser.java in 
 
 -------------------------------------------------------------------
 ## Installation
-You only need **four very simple steps**.
+You only need **four** very simple steps.
 1. Download **Google Protocol Buffer** and configure it in your IDE.
 2. Download **Protocolizer.jar** and add it at your class path.
 3. Configure the annotation processor (**cat.ogasoft.protocolizer.processor.ProtoFileProcessorV2**) in your IDE or classpath.
 4. Done.
+
+-------------------------------------------------------------------
+## Compile
+To compile protoc files to Java messages you only need write a public abstract class annotated with **ProtoFileV2.Compiler** per project. The parameter *command* in this annotation must be the protoc (Protocol Buffer compiler) absolute path.
+
+```java
+@ProtoFileV2.Compiler(command = "/opt/protoc-3.2.0-linux-x86_64/bin/protoc")
+public abstract class Compiler {
+
+}
+```

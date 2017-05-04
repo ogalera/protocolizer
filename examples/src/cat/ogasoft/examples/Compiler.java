@@ -15,6 +15,6 @@ import cat.ogasoft.protocolizer.annotations.ProtoFileV2;
  * @brief DESCRIPTION
  */
 @ProtoFileV2.Compiler(command = "/opt/protoc-3.2.0-linux-x86_64/bin/protoc")
-public class Compiler {
+public abstract class Compiler {
 
 }
