@@ -25,9 +25,10 @@ import java.util.List;
  * @brief Very simple Protocolizer example.
  */
 @ProtoFileV2.File(pJavaName = "Example")
+@ProtoFileV2.Dumpper
 public class Example {
 
-    @ProtoFileV2.File.Message
+    @ProtoFileV2.File.Message(parallel = true)
     public static class Person {
 
         @ProtoFileV2.File.Message.Field
@@ -39,7 +40,7 @@ public class Example {
         @ProtoFileV2.File.Message.Field(label = ProtoFileV2.File.Message.Field.Label.OPTIONAL)
         private String email;
 
-        @ProtoFileV2.File.Message.Field
+        @ProtoFileV2.File.Message.Field(label = ProtoFileV2.File.Message.Field.Label.REPEATED)
         private List<PhoneNumber> phones;
 
         @ProtoFileV2.File.Enum
@@ -112,7 +113,7 @@ public class Example {
     @ProtoFileV2.File.Message
     public static class AddressBook {
 
-        @ProtoFileV2.File.Message.Field
+        @ProtoFileV2.File.Message.Field(label = ProtoFileV2.File.Message.Field.Label.REPEATED)
         private List<Person> people;
 
         public List<Person> getPeople() {
