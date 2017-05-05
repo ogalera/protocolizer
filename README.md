@@ -1,5 +1,4 @@
-<img style="margin-left:auto, margin-right:auto" src="https://github.com/ogalera/protocolizer/blob/master/resources/logo2.png" ></img>
--------------------------------------------------------------------
+<img src="https://github.com/ogalera/protocolizer/blob/master/resources/logo2.png" ></img>
 
 # Protocolizer
 **Zero-overhead Java to Protoc - Protoc to Java** automatizer, at roughly **133Kb**, the library is very light and only works in development pahse to obtain a single contact point with Google Protocol Buffer.
