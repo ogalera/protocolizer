@@ -26,7 +26,7 @@ public class DumpperException extends Exception {
     /**
      * @pre --
      * @post DeserializationException has been created with message.
-     * @param message describing the dumpper error.
+     * @param message describing the dumper error.
      */
     public DumpperException(String message) {
         super("Exception in Serialization phase, message: " + message);

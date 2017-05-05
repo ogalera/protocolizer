@@ -28,13 +28,17 @@ import org.apache.commons.exec.DefaultExecutor;
  * @author Oscar Galera i Alfaro
  * @date Apr 27, 2017 [5:10:19 PM]
  *
- * @brief Functional class for serialize and deserialize Google Protocol Buffer messages.
+ * @brief Functional class for compile protoc files in Java compiled protocol buffer messages.
  */
-public class CompilerPhase {
-    
+public abstract class CompilerPhase {
+
     public static void processCompiler(RoundEnvironment roundEnv) throws CompilerException {
         try {
-            String protocPath = "src" + File.separatorChar + "cat" + File.separatorChar + "ogasoft" + File.separatorChar + "protocolizer" + File.separatorChar + "protoc";
+            String protocPath = "src" + File.separatorChar
+                    + "cat" + File.separatorChar
+                    + "ogasoft" + File.separatorChar
+                    + "protocolizer" + File.separatorChar
+                    + "protoc";
             for (Element element : roundEnv.getElementsAnnotatedWith(ProtoFileV2.Compiler.class)) {
                 ProtoFileV2.Compiler compiler = element.getAnnotation(ProtoFileV2.Compiler.class);
                 if (compiler.compile()) {

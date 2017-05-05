@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cat.ogasoft.protocolizer.pens.dumppers;
+package cat.ogasoft.protocolizer.pens.dumpers;
 
 import cat.ogasoft.protocolizer.pens.generation.Pen;
 import java.util.Iterator;
@@ -27,14 +27,14 @@ import java.util.Map;
  *
  * @brief A class that contains all SerializerMessages of a protoc file.
  */
-public class DumpperRootMessagePen extends Pen {
+public class DumperRootMessagePen extends Pen {
 
     private final String javaFQN;
     private final List<SerializerMessagePen> serializerMessages;
     private final List<DeserializerMessagePen> deserializerMessages;
     private final Map<String, String> builders;
 
-    private DumpperRootMessagePen(String sJavaClass, String javaFQN, Map<String, String> builders) {
+    private DumperRootMessagePen(String sJavaClass, String javaFQN, Map<String, String> builders) {
         super(0, "public class " + sJavaClass + " {", "}");
         this.serializerMessages = new LinkedList<>();
         this.deserializerMessages = new LinkedList<>();
@@ -42,8 +42,8 @@ public class DumpperRootMessagePen extends Pen {
         this.builders = builders;
     }
 
-    public static DumpperRootMessagePen build(String sJavaClass, String sJavaFQN, Map<String, String> builders) {
-        return new DumpperRootMessagePen(sJavaClass, sJavaFQN, builders);
+    public static DumperRootMessagePen build(String sJavaClass, String sJavaFQN, Map<String, String> builders) {
+        return new DumperRootMessagePen(sJavaClass, sJavaFQN, builders);
     }
 
     public SerializerMessagePen serializerMessage(String sJavaClass,

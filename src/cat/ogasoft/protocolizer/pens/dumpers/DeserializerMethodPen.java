@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cat.ogasoft.protocolizer.pens.dumppers;
+package cat.ogasoft.protocolizer.pens.dumpers;
 
 import cat.ogasoft.protocolizer.annotations.ProtoFileV2.File.Message.Field.DataType;
 import cat.ogasoft.protocolizer.pens.generation.MessagePen;
@@ -27,23 +27,60 @@ import java.util.Map;
  * @author Oscar Galera i Alfaro
  * @date Apr 25, 2017 [3:55:12 PM]
  *
- * @brief DESCRIPTION
+ * @brief A pen to write deserialize methods for protoc messages.
  */
 public class DeserializerMethodPen extends Pen {
 
-    private final Iterator<MessagePen.Field> fields;
+    private final Iterator<MessagePen.Field> fields; //<Message fields.
 
-    public DeserializerMethodPen(int level, String methodName, String mJavaFQN, String pJavaFQN, Iterator<MessagePen.Field> fields) {
+    /**
+     * @pre level >= 0
+     * @post deserializer method has been created.
+     * @param level deserializer
+     * @param methodName method name.
+     * @param mJavaFQN method return.
+     * @param pJavaFQN method parameter.
+     * @param fields of the message.
+     */
+    public DeserializerMethodPen(int level,
+            String methodName,
+            String mJavaFQN,
+            String pJavaFQN,
+            Iterator<MessagePen.Field> fields) {
         super(level, "public static " + mJavaFQN + " " + methodName + "(" + pJavaFQN + " target){", "}");
         super.writeInnln(mJavaFQN + " result = new " + mJavaFQN + "();");
         this.fields = fields;
     }
 
-    public static DeserializerMethodPen build(int level, String methodName, String mJavaFQN, String pJavaFQN, Iterator<MessagePen.Field> fields) {
+    /**
+     * @pre level >= 0
+     * @post new DeserializerMethodPen has been created
+     * @param level of the method.
+     * @param methodName name for the method.
+     * @param mJavaFQN method returns type.
+     * @param pJavaFQN method parameter.
+     * @param fields deserializer message fields.
+     * @return new DeserializerMethodPen.
+     */
+    public static DeserializerMethodPen build(int level,
+            String methodName,
+            String mJavaFQN,
+            String pJavaFQN,
+            Iterator<MessagePen.Field> fields) {
         return new DeserializerMethodPen(level, methodName, mJavaFQN, pJavaFQN, fields);
     }
 
-    public DeserializerMethodPen construct(Map<String, String> methodsNS, Map<String, String> enumsNS, Map<String, String> mFQN2pFQN) {
+    /**
+     * @pre methodsNS, enumsNS and mFQN2pFQN are completed.
+     * @post current method has been constructed.
+     * @param methodsNS namespace for all methods.
+     * @param enumsNS namespace for all enumerations.
+     * @param mFQN2pFQN translate function from message FQN to protoc FQN.
+     * @return current method pen constructed.
+     */
+    public DeserializerMethodPen construct(Map<String, String> methodsNS,
+            Map<String, String> enumsNS,
+            Map<String, String> mFQN2pFQN) {
         while (fields.hasNext()) {
             MessagePen.Field field = fields.next();
             switch (field.label) {
@@ -51,13 +88,13 @@ public class DeserializerMethodPen extends Pen {
                     if (field.type == DataType.COMPOSED) {
                         String parameter = enumsNS.get(field.javaFQN);
                         if (parameter != null) {
-                            parameter = field.javaFQN + ".valueOf(target." + getGetterJava(field, field.javaName) + "().name())";
+                            parameter = field.javaFQN + ".valueOf(target." + getGetterJava(field.javaName) + "().name())";
                         } else {
-                            parameter = methodsNS.get(field.javaFQN) + "(target." + getGetterJava(field, field.javaName) + "())";
+                            parameter = methodsNS.get(field.javaFQN) + "(target." + getGetterJava(field.javaName) + "())";
                         }
                         super.writeInnln("result." + getSetterProto(field.protoName) + "(" + parameter + ");");
                     } else {
-                        super.writeInnln("result." + getSetterProto(field.protoName) + "(target." + getGetterJava(field, field.javaName) + "());");
+                        super.writeInnln("result." + getSetterProto(field.protoName) + "(target." + getGetterJava(field.javaName) + "());");
                     }
                     break;
                 case OPTIONAL:
@@ -113,34 +150,82 @@ public class DeserializerMethodPen extends Pen {
         return this;
     }
 
-    private static String getGetterJava(MessagePen.Field field, String name) {
+    /**
+     * @pre --
+     * @post getter for name in java format.
+     * @param name for getter.
+     * @return getter for name in java format
+     */
+    private static String getGetterJava(String name) {
         return "get" + name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 
+    /**
+     * @pre --
+     * @post setter for name in java format.
+     * @param name for setter.
+     * @return setter for name in java format
+     */
     private static String getSetterJava(String name) {
         return "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 
+    /**
+     * @pre --
+     * @post setter for name in protocol buffer format.
+     * @param name for setter.
+     * @return setter for name in protocol buffer format.
+     */
     private static String getSetterProto(String name) {
         return "set" + name.substring(0, 1).toUpperCase() + cleanProto(name.substring(1));
     }
 
+    /**
+     * @pre --
+     * @post getter for name in protocol buffer format.
+     * @param name for getter.
+     * @return getter for name in protocol buffer format.
+     */
     private static String getGetterProto(String name) {
         return "get" + name.substring(0, 1).toUpperCase() + cleanProto(name.substring(1));
     }
 
+    /**
+     * @pre --
+     * @post has for name in protocol buffer format.
+     * @param name for has.
+     * @return has for name in protocol buffer format.
+     */
     private static String getHasProto(String name) {
         return "has" + name.substring(0, 1).toUpperCase() + cleanProto(name.substring(1));
     }
 
+    /**
+     * @pre --
+     * @post count for name in protocol buffer format.
+     * @param name for count.
+     * @return count for name in protocol buffer format.
+     */
     private static String getCountProto(String name) {
         return "get" + name.substring(0, 1).toUpperCase() + cleanProto(name.substring(1)) + "Count";
     }
 
+    /**
+     * @pre --
+     * @post list for name in protocol buffer format.
+     * @param name for list.
+     * @return list for name in protocol buffer format.
+     */
     private static String getListProto(String name) {
         return "get" + name.substring(0, 1).toUpperCase() + cleanProto(name.substring(1)) + "List";
     }
 
+    /**
+     * @pre --
+     * @post returns dirty in protoc format.
+     * @para dirty to clean.
+     * @return dirty in protoc format.
+     */
     private static String cleanProto(String dirty) {
         char[] result = new char[dirty.length()];
         int index = 0;
@@ -158,6 +243,11 @@ public class DeserializerMethodPen extends Pen {
         return new String(result);
     }
 
+    /**
+     * @pre --
+     * @post returns deserializerMethodPen content.
+     * @return deserializerMethodPen content.
+     */
     public List<String> content() {
         List<String> content = new LinkedList<>();
         super.addBegin(content);

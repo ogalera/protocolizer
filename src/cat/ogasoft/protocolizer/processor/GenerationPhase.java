@@ -31,11 +31,18 @@ import javax.lang.model.type.MirroredTypeException;
  * @author Oscar Galera i Alfaro
  * @date Apr 27, 2017 [5:03:57 PM]
  *
- * @brief DESCRIPTION
+ * @brief Functional class for generate protoc files.
  */
-public class GenerationPhase {
+public abstract class GenerationPhase {
 
-    public static FilePen processFile(Element element, ProtoFileV2.File protoc, Map<String, String> mFQN2pFQN) throws GenerationException {
+    /**
+     * @pre element is annotated with File.
+     * @post protoc file based on element has been created.
+     * @throws GenerationException if any goes wrong.
+     */
+    public static FilePen processFile(Element element,
+            ProtoFileV2.File protoc,
+            Map<String, String> mFQN2pFQN) throws GenerationException {
         FilePen filePen = null;
         try {
             String pJavaName = nullOrEmptyToName(protoc.pJavaName(), element);
@@ -148,6 +155,10 @@ public class GenerationPhase {
         }
     }
 
+    /**
+     * @pre --
+     * @post all imports has been added to filePen.
+     */
     private static void imports(FilePen filePen, ProtoFileV2.File.Import[] imports) throws GenerationException {
         for (ProtoFileV2.File.Import importt : imports) {
             try {
@@ -158,23 +169,35 @@ public class GenerationPhase {
         }
     }
 
+    /**
+     * @pre --
+     * @post all options has been added to filePen.
+     */
     private static void options(FilePen filePen, ProtoFileV2.File.Option[] options) {
         for (ProtoFileV2.File.Option option : options) {
             filePen.addOption(option.name(), option.value());
         }
     }
 
-    private static void getEnum(EnumPen ep, Element element) throws Exception {
+    /**
+     * @pre --
+     * @post all enums has been added to enumPen.
+     */
+    private static void getEnum(EnumPen enumPen, Element element) throws Exception {
         if (element.getKind() != ElementKind.ENUM) {
             throw new Exception(element.getSimpleName() + " is not an ennumeration");
         }
         for (Element inner : element.getEnclosedElements()) {
             if (inner.getKind() == ElementKind.ENUM_CONSTANT) {
-                ep.addValue(inner.getSimpleName().toString());
+                enumPen.addValue(inner.getSimpleName().toString());
             }
         }
     }
 
+    /**
+     * @pre --
+     * @post returns name or element simple name if name is empty or null
+     */
     private static String nullOrEmptyToName(String name, Element element) {
         return Strings.isNullOrEmpty(name) ? element.getSimpleName().toString() : name;
     }

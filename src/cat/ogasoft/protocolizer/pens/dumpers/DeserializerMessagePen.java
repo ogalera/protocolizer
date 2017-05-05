@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cat.ogasoft.protocolizer.pens.dumppers;
+package cat.ogasoft.protocolizer.pens.dumpers;
 
 import cat.ogasoft.protocolizer.pens.generation.MessagePen;
 import cat.ogasoft.protocolizer.pens.generation.Pen;
@@ -31,7 +31,7 @@ import java.util.Map;
 public class DeserializerMessagePen extends Pen {
 
     private final List<DeserializerMessagePen> messages; //<Nested messages.
-    private final Map<String, String> builders;
+    private final Map<String, String> builders; //<Translate function from java FQN to deserialize methods.
     private final String dJavaFQN; //<deserialize Java FQN
     private final String pJavaFQN; //<Protocol buffer java FQN.
     private final List<DeserializerMethodPen> methods; //<Nested methods to deserialize nested messages.
@@ -177,7 +177,16 @@ public class DeserializerMessagePen extends Pen {
         return method;
     }
 
-    public void constructMethods(Map<String, String> methodsNS, Map<String, String> enumsNS, Map<String, String> mFQN2pFQN) {
+    /**
+     * @pre --
+     * @post deserializer inner methods has been constructed.
+     * @param methodsNS Java FQN to FQN deserializer message method.
+     * @param enumsNS Java FQN to FQN deserializer enumeration method.
+     * @param mFQN2pFQN Java message to protoc message.
+     */
+    public void constructMethods(Map<String, String> methodsNS,
+            Map<String, String> enumsNS,
+            Map<String, String> mFQN2pFQN) {
         for (DeserializerMessagePen smp : messages) {
             smp.constructMethods(methodsNS, enumsNS, mFQN2pFQN);
         }
@@ -186,6 +195,11 @@ public class DeserializerMessagePen extends Pen {
         }
     }
 
+    /**
+     * @pre --
+     * @post returns deserializer content.
+     * @return deserializer content.
+     */
     public List<String> content() {
         List<String> content = new LinkedList<>();
         super.addBegin(content);

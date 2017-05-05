@@ -1,6 +1,6 @@
-<img src="https://github.com/ogalera/protocolizer/blob/master/resources/logo2.png">
 # Protocolizer
-**Zero-overhead Java <-> Protocol Buffer** automatizer, at roughly **133Kb**, the library is very light and only works in development pahse to obtain a single contact point with Protocol Buffer.
+<img src="https://github.com/ogalera/protocolizer/blob/master/resources/logo2.png" />
+**Zero-overhead Java to Protoc - Protoc to Java** automatizer, at roughly **133Kb**, the library is very light and only works in development pahse to obtain a single contact point with Google Protocol Buffer.
 
 -------------------------------------------------------------------
 
@@ -10,9 +10,11 @@ Write less and do more **annotating POJO Java classes** that represents a protoc
 ### Structure
 ![esquma](https://github.com/ogalera/protocolizer/blob/master/resources/esquema.png)
 
-Note that this library only works at compile time, so your project will never experiment any overhead ad deployment.
+### Message Interchange
 
 ![esquma](https://github.com/ogalera/protocolizer/blob/master/resources/intercanvi.png)
+
+Note that this library only works at compile time, so your project will never experiment any overhead ad deployment.
 
 -------------------------------------------------------------------
 ## Example

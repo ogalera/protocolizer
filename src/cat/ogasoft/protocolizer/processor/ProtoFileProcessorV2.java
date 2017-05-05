@@ -26,7 +26,7 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.TypeElement;
 import cat.ogasoft.protocolizer.pens.generation.FilePen;
-import cat.ogasoft.protocolizer.pens.dumppers.DumppersFilePen;
+import cat.ogasoft.protocolizer.pens.dumpers.DumpersFilePen;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,8 +49,14 @@ import javax.lang.model.element.Element;
     "cat.ogasoft.protocolizer.annotations.ProtoFileV2.Serializer"})
 public class ProtoFileProcessorV2 extends AbstractProcessor {
 
-    private static final String DUMPPERS_PATH = "cat.ogasoft.protocolizer.dumppers";
+    private static final String DUMPERS_PATH = "cat.ogasoft.protocolizer.dumpers"; //<Path for dumpers.
 
+    /**
+     * @pre protocolizer elements has been annotated correctly.
+     * @post protocolizer has been executed.
+     * @param annotations
+     * @param roundEnv all elements.
+     */
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         boolean processed = true;
@@ -92,27 +98,27 @@ public class ProtoFileProcessorV2 extends AbstractProcessor {
              * We have to construct all the methods at the end of the process,
              * so first of all we collect all methods in methods list.
              */
-            final List<DumppersFilePen> dummperFilePens = new LinkedList<>();
+            final List<DumpersFilePen> dummperFilePens = new LinkedList<>();
             for (Element element : roundEnv.getElementsAnnotatedWith(ProtoFileV2.Dumpper.class)) {
                 FilePen fp = filePensMap.get(element.asType().toString());
                 //We need the FilePen associated with the message to generate the serializer.
                 if (fp == null) {
-                    throw new DumpperException("You can't generate a dumpper for class that is not a message");
+                    throw new DumpperException("You can't generate a dumper for class that is not a message");
                 }
                 ProtoFileV2.Dumpper dumper = element.getAnnotation(ProtoFileV2.Dumpper.class);
                 boolean serialize = dumper.type() == SERIALIZER || dumper.type() == BOTH;
                 boolean deserialize = dumper.type() == DESERIALIZER || dumper.type() == BOTH;
-                dummperFilePens.add(DumpperPhase.dump(serialize, deserialize, dumper.root(), DUMPPERS_PATH, fp, methodsNS, enumsNS));
+                dummperFilePens.add(DumperPhase.dump(serialize, deserialize, dumper.root(), DUMPERS_PATH, fp, methodsNS, enumsNS));
             }
 
-            for (DumppersFilePen dumpperFilePen : dummperFilePens) {
-                if (dumpperFilePen.hasSerializer()) {
-                    dumpperFilePen.getSerializer().constructSerializerMethods(methodsNS, enumsNS, mFQN2pFQN);
-                    dumpperFilePen.getSerializer().dumpSerialize();
+            for (DumpersFilePen dumperFilePen : dummperFilePens) {
+                if (dumperFilePen.hasSerializer()) {
+                    dumperFilePen.getSerializer().constructSerializerMethods(methodsNS, enumsNS, mFQN2pFQN);
+                    dumperFilePen.getSerializer().dumpSerialize();
                 }
-                if (dumpperFilePen.hasDeserializer()) {
-                    dumpperFilePen.getDeserializer().constructDeserializerMethods(methodsNS, enumsNS, mFQN2pFQN);
-                    dumpperFilePen.getDeserializer().dumpDeserialize();
+                if (dumperFilePen.hasDeserializer()) {
+                    dumperFilePen.getDeserializer().constructDeserializerMethods(methodsNS, enumsNS, mFQN2pFQN);
+                    dumperFilePen.getDeserializer().dumpDeserialize();
                 }
             }
 

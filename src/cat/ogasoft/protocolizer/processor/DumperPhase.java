@@ -16,14 +16,14 @@
 package cat.ogasoft.protocolizer.processor;
 
 import cat.ogasoft.protocolizer.exceptions.DumpperException;
-import cat.ogasoft.protocolizer.pens.dumppers.DeserializerMessagePen;
+import cat.ogasoft.protocolizer.pens.dumpers.DeserializerMessagePen;
 import cat.ogasoft.protocolizer.pens.generation.EnumPen;
 import cat.ogasoft.protocolizer.pens.generation.FilePen;
 import cat.ogasoft.protocolizer.pens.generation.MessagePen;
-import cat.ogasoft.protocolizer.pens.dumppers.DumpperFilePen;
-import cat.ogasoft.protocolizer.pens.dumppers.SerializerMessagePen;
-import cat.ogasoft.protocolizer.pens.dumppers.DumpperRootMessagePen;
-import cat.ogasoft.protocolizer.pens.dumppers.DumppersFilePen;
+import cat.ogasoft.protocolizer.pens.dumpers.DumperFilePen;
+import cat.ogasoft.protocolizer.pens.dumpers.SerializerMessagePen;
+import cat.ogasoft.protocolizer.pens.dumpers.DumperRootMessagePen;
+import cat.ogasoft.protocolizer.pens.dumpers.DumpersFilePen;
 import java.io.File;
 import java.util.Iterator;
 import java.util.Map;
@@ -32,11 +32,24 @@ import java.util.Map;
  * @author Oscar Galera i Alfaro
  * @date Apr 27, 2017 [5:08:11 PM]
  *
- * @brief DESCRIPTION
+ * @brief Functional class for generate dumper files.
  */
-public class DumpperPhase {
+public abstract class DumperPhase {
 
-    public static DumppersFilePen dump(
+    /**
+     * @pre methodsNS and enumsNS are complete
+     * @post new DumperFilePen has been created
+     * @param serialize if serialize must be wrotten.
+     * @param deserialize if deserialize must be wroten.
+     * @param sRoot root for dumper
+     * @param sJavaPackage java package for dumper.
+     * @param filePen for this dumper.
+     * @param methodsNS translate function from java message FQN to protoc message FQN and vice-versa.
+     * @param enumsNS translate function from java enumeration FQN to protoc enumeration FQN and vice-versa.
+     * @return new DumperFilePen.
+     * @throws DumpperException if any goes wrong.
+     */
+    public static DumpersFilePen dump(
             boolean serialize,
             boolean deserialize,
             String sRoot,
@@ -44,7 +57,7 @@ public class DumpperPhase {
             FilePen filePen,
             Map<String, String> methodsNS,
             Map<String, String> enumsNS) throws DumpperException {
-        DumppersFilePen dumppers = new DumppersFilePen();
+        DumpersFilePen dumpers = new DumpersFilePen();
         try {
             if (serialize) {
                 System.out.println("SERIALIZE");
@@ -54,8 +67,8 @@ public class DumpperPhase {
                     throw new Exception("HO ho... can't create directory " + javaClassRoot.getAbsolutePath());
                 }
                 File fileDump = new File(javaClassRoot, sJavaClass + ".java");
-                DumpperFilePen serializedFilePen = DumpperFilePen.build(fileDump, sJavaPackage + ".serializers", sJavaClass, filePen.fileDescriptor);
-                DumpperRootMessagePen rootMessages = serializedFilePen.buildRoot(methodsNS);
+                DumperFilePen serializedFilePen = DumperFilePen.build(fileDump, sJavaPackage + ".serializers", sJavaClass, filePen.fileDescriptor);
+                DumperRootMessagePen rootMessages = serializedFilePen.buildRoot(methodsNS);
                 //For each message inside message root.
                 Iterator<MessagePen> messageIterador = filePen.messageIterator();
                 while (messageIterador.hasNext()) {
@@ -65,7 +78,7 @@ public class DumpperPhase {
                     //For each message inside a message root.
                     serializeInnerMessage(gMessagePen, sMessagePen, enumsNS);
                 }
-                dumppers.setSerializer(serializedFilePen);
+                dumpers.setSerializer(serializedFilePen);
             }
             if (deserialize) {
                 System.out.println("DESERIALIZE");
@@ -75,8 +88,8 @@ public class DumpperPhase {
                     throw new Exception("HO ho... can't create directory " + javaClassRoot.getAbsolutePath());
                 }
                 File fileDump = new File(javaClassRoot, sJavaClass + ".java");
-                DumpperFilePen deserializedFilePen = DumpperFilePen.build(fileDump, sJavaPackage + ".deserializers", sJavaClass, filePen.fileDescriptor);
-                DumpperRootMessagePen rootMessages = deserializedFilePen.buildRoot(methodsNS);
+                DumperFilePen deserializedFilePen = DumperFilePen.build(fileDump, sJavaPackage + ".deserializers", sJavaClass, filePen.fileDescriptor);
+                DumperRootMessagePen rootMessages = deserializedFilePen.buildRoot(methodsNS);
                 //For each message inside message root.
                 Iterator<MessagePen> messageIterador = filePen.messageIterator();
                 while (messageIterador.hasNext()) {
@@ -86,7 +99,7 @@ public class DumpperPhase {
                     //For each message inside a message root.
                     deserializeInnerMessage(gMessagePen, dMessagePen, enumsNS);
                 }
-                dumppers.setDeserializer(deserializedFilePen);
+                dumpers.setDeserializer(deserializedFilePen);
             }
             Iterator<EnumPen> enumIterator = filePen.enumIterator();
             while (enumIterator.hasNext()) {
@@ -97,26 +110,46 @@ public class DumpperPhase {
         } catch (Exception e) {
             throw new DumpperException(e.getMessage());
         }
-        return dumppers;
+        return dumpers;
     }
 
-    private static void serializeInnerMessage(MessagePen mp, SerializerMessagePen smp, Map<String, String> enumsNS) throws Exception {
-        Iterator<MessagePen> messagesIterator = mp.messageIterator();
+    /**
+     * @pre enumsNS is complete.
+     * @post all mp inner messages for serialize has been created inside smp.
+     * @param messagePen for new inner message.
+     * @param smessagePen for new inner message.
+     * @param enumsNS enumerations namespace.
+     * @throws Exception if any goes wrong.
+     */
+    private static void serializeInnerMessage(MessagePen messagePen,
+            SerializerMessagePen sMessagePen,
+            Map<String, String> enumsNS) throws Exception {
+        Iterator<MessagePen> messagesIterator = messagePen.messageIterator();
         while (messagesIterator.hasNext()) {
             //Each inner message is translated to public static method.
             MessagePen inMessage = messagesIterator.next();
-            SerializerMessagePen smp2 = smp.buildInn(inMessage.pJavaClass, inMessage.mJavaFQN, inMessage.pJavaClass, inMessage.parallel);
+            SerializerMessagePen smp2 = sMessagePen.buildInn(inMessage.pJavaClass, inMessage.mJavaFQN, inMessage.pJavaClass, inMessage.parallel);
             smp2.addMethod(inMessage.mJavaFQN, inMessage.pJavaClass, inMessage.pJavaFQN, inMessage.fieldIterator());
             serializeInnerMessage(inMessage, smp2, enumsNS);
         }
-        Iterator<EnumPen> enumIterator = mp.enumIterator();
+        Iterator<EnumPen> enumIterator = messagePen.enumIterator();
         while (enumIterator.hasNext()) {
             EnumPen ep = enumIterator.next();
             enumsNS.put(ep.mJavaFQN, ep.pJavaFQN);
         }
     }
 
-    private static void deserializeInnerMessage(MessagePen mp, DeserializerMessagePen smp, Map<String, String> enumsNS) throws Exception {
+    /**
+     * @pre enumsNS is complete.
+     * @post all mp inner messages for deserialize has been created inside smp.
+     * @param messagePen for new inner message.
+     * @param smessagePen for new inner message.
+     * @param enumsNS enumerations namespace.
+     * @throws Exception if any goes wrong.
+     */
+    private static void deserializeInnerMessage(MessagePen mp,
+            DeserializerMessagePen smp,
+            Map<String, String> enumsNS) throws Exception {
         Iterator<MessagePen> messagesIterator = mp.messageIterator();
         while (messagesIterator.hasNext()) {
             //Each inner message is translated to public static method.

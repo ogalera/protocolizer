@@ -13,32 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cat.ogasoft.protocolizer.pens.dumppers;
+package cat.ogasoft.protocolizer.pens.dumpers;
 
 /**
  * @author Oscar Galera i Alfaro
  * @date   Apr 30, 2017 [3:27:18 PM]
  *
- * @brief DESCRIPTION
+ * @brief Pen container for dumpers (serializer, deserializer).
  */
-public class DumppersFilePen {
+public class DumpersFilePen {
 
-    private DumpperFilePen serializer;
-    private DumpperFilePen deserializer;
+    private DumperFilePen serializer; //<Serializer pen.
+    private DumperFilePen deserializer; //<Deserializer pen.
 
-    public DumpperFilePen getSerializer() {
+    public DumperFilePen getSerializer() {
         return serializer;
     }
 
-    public void setSerializer(DumpperFilePen serializer) {
+    public void setSerializer(DumperFilePen serializer) {
         this.serializer = serializer;
     }
 
-    public DumpperFilePen getDeserializer() {
+    public DumperFilePen getDeserializer() {
         return deserializer;
     }
 
-    public void setDeserializer(DumpperFilePen deserializer) {
+    public void setDeserializer(DumperFilePen deserializer) {
         this.deserializer = deserializer;
     }
 
