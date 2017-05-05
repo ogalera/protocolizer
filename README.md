@@ -404,7 +404,9 @@ public class Parser {
 }
 
 ```
-In resume, you only need write two java classes (Example1.java & Parser.java in this example). 
+In resume, you only need write two java classes (Example1.java & Parser.java in this case). 
+
+For this example, library **user has wroten 162** lines and **protocolizer has wroten 212 lines** for you (without counting compiled message).
 
 -------------------------------------------------------------------
 ## Installation
