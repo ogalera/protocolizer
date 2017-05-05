@@ -1,4 +1,4 @@
-<center><img src="https://github.com/ogalera/protocolizer/blob/master/resources/logo2.png" ></img></center>
+<img style="margin-left:auto, margin-right:auto" src="https://github.com/ogalera/protocolizer/blob/master/resources/logo2.png" ></img>
 -------------------------------------------------------------------
 
 # Protocolizer
