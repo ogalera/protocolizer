@@ -16,7 +16,7 @@ Write less and do more **annotating POJO Java classes** that represents a protoc
 
 ![esquma](https://github.com/ogalera/protocolizer/blob/master/resources/intercanvi.png)
 
-Note that this library only works at compile time, so your project will never experiment any overhead ad deployment.
+*Note that this library only works at compile time, so your project will never experiment any overhead ad deployment.*
 
 -------------------------------------------------------------------
 ## Example
