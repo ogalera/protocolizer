@@ -344,9 +344,9 @@ public class Parser {
 
     public static void main(String... args) throws Exception {
         Example.AddressBook message = generateMessage();
-        byte[] raw = sender(message);
+        byte[] raw = senderParallel(message);
         System.out.println(Arrays.toString(raw));
-        receiver(raw);
+        receiverParallel(raw);
     }
 
     private static Example.AddressBook generateMessage() {
@@ -381,19 +381,28 @@ public class Parser {
         return addr;
     }
 
-    private static byte[] sender(Example.AddressBook addr) throws Exception {
+    private static byte[] senderParallel(Example.AddressBook addr) throws Exception {
 
         ExampleSerializer.AddressBook serializer = new ExampleSerializer.AddressBook();
         serializer.work(addr);
         return serializer.waitUntilEnd();
     }
 
-    private static Example.AddressBook receiver(byte[] raw) throws Exception {
+    private static Example.AddressBook receiverParallel(byte[] raw) throws Exception {
         ExampleDeserializer.AddressBook deserializer = new ExampleDeserializer.AddressBook();
         deserializer.work(raw);
         return deserializer.waitUntilEnd();
     }
+
+    private static byte[] sender(Example.AddressBook addr) throws Exception {
+        return new ExampleSerializer.AddressBook().dump(addr);
+    }
+
+    private static Example.AddressBook receiver(byte[] raw) throws Exception {
+        return new ExampleDeserializer.AddressBook().dump(raw);
+    }
 }
+
 ```
 In resume, you only need write two java classes (Example1.java & Parser.java in this example). 
 
