@@ -50,7 +50,7 @@ public class DumperFilePen extends Pen {
         super.writeNoTabln("//This class has been generated automatically, plase");
         super.writeNoTabln("//DO NOT EDIT!");
         super.writeNoTabln("//");
-        super.writeNoTabln("//For any question, feel free to contact me at: oscar.galeraa@gmail.com");
+        super.writeNoTabln("//For any question, feel free to contact me at: ogalera.dev@gmail.com");
         super.newLine();
         super.writeNoTabln("package " + fileDescriptor.sJavaPackage + ";");
         super.newLine();

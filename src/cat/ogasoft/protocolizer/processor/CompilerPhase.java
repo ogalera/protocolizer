@@ -23,6 +23,8 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author Oscar Galera i Alfaro
@@ -32,6 +34,8 @@ import org.apache.commons.exec.DefaultExecutor;
  */
 public abstract class CompilerPhase {
 
+    private static final Logger LOG = LogManager.getLogger();
+
     public static void processCompiler(RoundEnvironment roundEnv) throws CompilerException {
         try {
             String protocPath = "src" + File.separatorChar
@@ -39,6 +43,8 @@ public abstract class CompilerPhase {
                     + "ogasoft" + File.separatorChar
                     + "protocolizer" + File.separatorChar
                     + "protoc";
+
+            DefaultExecutor de = new DefaultExecutor();
             for (Element element : roundEnv.getElementsAnnotatedWith(ProtoFileV2.Compiler.class)) {
                 ProtoFileV2.Compiler compiler = element.getAnnotation(ProtoFileV2.Compiler.class);
                 if (compiler.compile()) {
@@ -55,13 +61,15 @@ public abstract class CompilerPhase {
                             return pathname.getName().toLowerCase().endsWith(".proto");
                         }
                     };
-                    DefaultExecutor de = new DefaultExecutor();
                     for (File protoc : rootDirectori.listFiles(filter)) {
-                        CommandLine cmd = CommandLine.parse(compiler.command() + " --proto_path=" + protocPath + " " + compiler.language().option + "=src " + base + File.separatorChar + protoc.getName());
+                        String target = base + File.separatorChar + protoc.getName();
+                        LOG.info("\tCompiling " + target + "...");
+                        CommandLine cmd = CommandLine.parse(compiler.command() + " --proto_path=" + protocPath + " " + compiler.language().option + "=src " + target);
                         int result = de.execute(cmd);
                         if (result != 0) {
                             throw new CompilerException("HO ho... somthing went wrong, code: " + result);
                         }
+                        LOG.info("\t" + target + " compiled");
                     }
                 }
             }

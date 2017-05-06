@@ -19,7 +19,9 @@ import cat.ogasoft.protocolizer.annotations.ProtoFileV2;
 import static cat.ogasoft.protocolizer.annotations.ProtoFileV2.Dumpper.DumpperTypes.BOTH;
 import static cat.ogasoft.protocolizer.annotations.ProtoFileV2.Dumpper.DumpperTypes.DESERIALIZER;
 import static cat.ogasoft.protocolizer.annotations.ProtoFileV2.Dumpper.DumpperTypes.SERIALIZER;
-import cat.ogasoft.protocolizer.exceptions.DumpperException;
+import cat.ogasoft.protocolizer.exceptions.CompilerException;
+import cat.ogasoft.protocolizer.exceptions.DumperException;
+import cat.ogasoft.protocolizer.exceptions.GenerationException;
 import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
@@ -27,11 +29,14 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.TypeElement;
 import cat.ogasoft.protocolizer.pens.generation.FilePen;
 import cat.ogasoft.protocolizer.pens.dumpers.DumpersFilePen;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import javax.lang.model.element.Element;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author Oscar Galera i Alfaro
@@ -50,6 +55,7 @@ import javax.lang.model.element.Element;
 public class ProtoFileProcessorV2 extends AbstractProcessor {
 
     private static final String DUMPERS_PATH = "cat.ogasoft.protocolizer.dumpers"; //<Path for dumpers.
+    private static final Logger LOG = LogManager.getLogger();
 
     /**
      * @pre protocolizer elements has been annotated correctly.
@@ -59,6 +65,7 @@ public class ProtoFileProcessorV2 extends AbstractProcessor {
      */
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        LOG.info("Protocolizer Initiated");
         boolean processed = true;
         try {
             Map<String, String> mFQN2pFQN = new HashMap<>(); //<Map from java message FQN to protoc FQN needed for nested messages
@@ -69,6 +76,7 @@ public class ProtoFileProcessorV2 extends AbstractProcessor {
              * For each element annotated with File, we must to generate a
              * protoc message.
              */
+            LOG.info("***GENERATION PHASE");
             for (Element element : roundEnv.getElementsAnnotatedWith(ProtoFileV2.File.class)) {
                 ProtoFileV2.File protoc = element.getAnnotation(ProtoFileV2.File.class);
                 //We only generate protoc messages for theses Files with generateSource at ture.
@@ -82,8 +90,11 @@ public class ProtoFileProcessorV2 extends AbstractProcessor {
                 filePen.dump(filePensMap);
             }
 
+            LOG.info("\t" + filePensMap.values().size() + " protoc files written");
+
             //PHASE 2- Compile protoc messages.
             //At this point all protoc messages has been generated, so must we compile theses protoc files?
+            LOG.info("***COMPILER PHASE");
             CompilerPhase.processCompiler(roundEnv);
 
             //PHASE 3- Generate Serializer classes.
@@ -98,12 +109,13 @@ public class ProtoFileProcessorV2 extends AbstractProcessor {
              * We have to construct all the methods at the end of the process,
              * so first of all we collect all methods in methods list.
              */
+            LOG.info("***DUMPER PHASE");
             final List<DumpersFilePen> dummperFilePens = new LinkedList<>();
             for (Element element : roundEnv.getElementsAnnotatedWith(ProtoFileV2.Dumpper.class)) {
                 FilePen fp = filePensMap.get(element.asType().toString());
                 //We need the FilePen associated with the message to generate the serializer.
                 if (fp == null) {
-                    throw new DumpperException("You can't generate a dumper for class that is not a message");
+                    throw new DumperException("You can't generate a dumper for class that is not a message");
                 }
                 ProtoFileV2.Dumpper dumper = element.getAnnotation(ProtoFileV2.Dumpper.class);
                 boolean serialize = dumper.type() == SERIALIZER || dumper.type() == BOTH;
@@ -121,9 +133,19 @@ public class ProtoFileProcessorV2 extends AbstractProcessor {
                     dumperFilePen.getDeserializer().dumpDeserialize();
                 }
             }
-
-        } catch (Throwable t) {
-            System.out.println(t.getMessage());
+            LOG.info(dummperFilePens.size() + " dumpers writen");
+            LOG.info("ALL OK!!!");
+        } catch (GenerationException ge) {
+            LOG.info("FAILED!!!, Generation phase ERROR, message: " + ge.getMessage());
+            processed = false;
+        } catch (CompilerException ce) {
+            LOG.info("FAILED!!!, Compiler phase ERROR, message: " + ce.getMessage());
+            processed = false;
+        } catch (DumperException de) {
+            LOG.info("FAILED!!!, Dumper phase ERROR, message: " + de.getMessage());
+            processed = false;
+        } catch (IOException ioe) {
+            LOG.info("FAILED!!!, IO error, message: " + ioe.getMessage());
             processed = false;
         }
         return processed;

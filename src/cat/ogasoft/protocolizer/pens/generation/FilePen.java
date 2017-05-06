@@ -52,7 +52,7 @@ public class FilePen extends Pen {
         }
         super.writeNoTabln("//Protocolizer " + new SimpleDateFormat("dd/MM/yyyy kk:mm:ss").format(new Date()));
         super.writeNoTabln("//This class has been generated automatically, please DO NOT EDIT!");
-        super.writeNoTabln("//For any question, feel free to contact me at: oscar.galeraa@gmail.com");
+        super.writeNoTabln("//For any question, feel free to contact me at: ogalera.dev@gmail.com");
         this.fileDescriptor = fileDescriptor;
         this.messages = new LinkedList<>();
         this.enums = new LinkedList<>();

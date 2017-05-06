@@ -15,7 +15,7 @@
  */
 package cat.ogasoft.protocolizer.processor;
 
-import cat.ogasoft.protocolizer.exceptions.DumpperException;
+import cat.ogasoft.protocolizer.exceptions.DumperException;
 import cat.ogasoft.protocolizer.pens.dumpers.DeserializerMessagePen;
 import cat.ogasoft.protocolizer.pens.generation.EnumPen;
 import cat.ogasoft.protocolizer.pens.generation.FilePen;
@@ -27,6 +27,8 @@ import cat.ogasoft.protocolizer.pens.dumpers.DumpersFilePen;
 import java.io.File;
 import java.util.Iterator;
 import java.util.Map;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author Oscar Galera i Alfaro
@@ -35,6 +37,8 @@ import java.util.Map;
  * @brief Functional class for generate dumper files.
  */
 public abstract class DumperPhase {
+
+    private static final Logger LOG = LogManager.getLogger();
 
     /**
      * @pre methodsNS and enumsNS are complete
@@ -47,7 +51,7 @@ public abstract class DumperPhase {
      * @param methodsNS translate function from java message FQN to protoc message FQN and vice-versa.
      * @param enumsNS translate function from java enumeration FQN to protoc enumeration FQN and vice-versa.
      * @return new DumperFilePen.
-     * @throws DumpperException if any goes wrong.
+     * @throws DumperException if any goes wrong.
      */
     public static DumpersFilePen dump(
             boolean serialize,
@@ -56,49 +60,70 @@ public abstract class DumperPhase {
             String sJavaPackage,
             FilePen filePen,
             Map<String, String> methodsNS,
-            Map<String, String> enumsNS) throws DumpperException {
+            Map<String, String> enumsNS) throws DumperException {
         DumpersFilePen dumpers = new DumpersFilePen();
         try {
             if (serialize) {
-                System.out.println("SERIALIZE");
                 String sJavaClass = filePen.fileDescriptor.pJavaClass + "Serializer";
                 File javaClassRoot = new File((sRoot + "." + sJavaPackage + ".serializers").replace('.', File.separatorChar));
                 if (!javaClassRoot.exists() && !javaClassRoot.mkdirs()) {
                     throw new Exception("HO ho... can't create directory " + javaClassRoot.getAbsolutePath());
                 }
                 File fileDump = new File(javaClassRoot, sJavaClass + ".java");
-                DumperFilePen serializedFilePen = DumperFilePen.build(fileDump, sJavaPackage + ".serializers", sJavaClass, filePen.fileDescriptor);
+                DumperFilePen serializedFilePen = DumperFilePen.build(fileDump,
+                        sJavaPackage + ".serializers",
+                        sJavaClass,
+                        filePen.fileDescriptor);
+                LOG.info("\tWriting serializer for " + filePen.fileDescriptor.pJavaFQN + "...");
                 DumperRootMessagePen rootMessages = serializedFilePen.buildRoot(methodsNS);
                 //For each message inside message root.
                 Iterator<MessagePen> messageIterador = filePen.messageIterator();
                 while (messageIterador.hasNext()) {
                     MessagePen gMessagePen = messageIterador.next();
-                    SerializerMessagePen sMessagePen = rootMessages.serializerMessage(gMessagePen.pJavaClass, gMessagePen.mJavaFQN, gMessagePen.pJavaClass, gMessagePen.parallel);
-                    sMessagePen.addMethod(gMessagePen.mJavaFQN, gMessagePen.pJavaClass, gMessagePen.pJavaFQN, gMessagePen.fieldIterator());
+                    SerializerMessagePen sMessagePen = rootMessages.serializerMessage(gMessagePen.pJavaClass,
+                            gMessagePen.mJavaFQN,
+                            gMessagePen.pJavaClass,
+                            gMessagePen.parallel);
+                    sMessagePen.addMethod(gMessagePen.mJavaFQN,
+                            gMessagePen.pJavaClass,
+                            gMessagePen.pJavaFQN,
+                            gMessagePen.fieldIterator());
                     //For each message inside a message root.
                     serializeInnerMessage(gMessagePen, sMessagePen, enumsNS);
                 }
+                LOG.info("\t" + filePen.fileDescriptor.pJavaFQN + " written");
                 dumpers.setSerializer(serializedFilePen);
             }
             if (deserialize) {
-                System.out.println("DESERIALIZE");
                 String sJavaClass = filePen.fileDescriptor.pJavaClass + "Deserializer";
                 File javaClassRoot = new File((sRoot + "." + sJavaPackage + ".deserializers").replace('.', File.separatorChar));
                 if (!javaClassRoot.exists() && !javaClassRoot.mkdirs()) {
                     throw new Exception("HO ho... can't create directory " + javaClassRoot.getAbsolutePath());
                 }
                 File fileDump = new File(javaClassRoot, sJavaClass + ".java");
-                DumperFilePen deserializedFilePen = DumperFilePen.build(fileDump, sJavaPackage + ".deserializers", sJavaClass, filePen.fileDescriptor);
+                DumperFilePen deserializedFilePen = DumperFilePen.build(fileDump,
+                        sJavaPackage + ".deserializers",
+                        sJavaClass,
+                        filePen.fileDescriptor);
+                LOG.info("\tWriting deserializer for " + filePen.fileDescriptor.pJavaFQN + "...");
                 DumperRootMessagePen rootMessages = deserializedFilePen.buildRoot(methodsNS);
                 //For each message inside message root.
                 Iterator<MessagePen> messageIterador = filePen.messageIterator();
                 while (messageIterador.hasNext()) {
                     MessagePen gMessagePen = messageIterador.next();
-                    DeserializerMessagePen dMessagePen = rootMessages.deserializerMessage(gMessagePen.pJavaClass, gMessagePen.mJavaFQN, gMessagePen.pJavaClass, gMessagePen.pJavaFQN, gMessagePen.parallel);
-                    dMessagePen.addMethod(gMessagePen.mJavaFQN, gMessagePen.pJavaClass, gMessagePen.pJavaFQN, gMessagePen.fieldIterator());
+                    DeserializerMessagePen dMessagePen = rootMessages.deserializerMessage(gMessagePen.pJavaClass,
+                            gMessagePen.mJavaFQN,
+                            gMessagePen.pJavaClass,
+                            gMessagePen.pJavaFQN,
+                            gMessagePen.parallel);
+                    dMessagePen.addMethod(gMessagePen.mJavaFQN,
+                            gMessagePen.pJavaClass,
+                            gMessagePen.pJavaFQN,
+                            gMessagePen.fieldIterator());
                     //For each message inside a message root.
                     deserializeInnerMessage(gMessagePen, dMessagePen, enumsNS);
                 }
+                LOG.info("\t" + filePen.fileDescriptor.pJavaFQN + " written");
                 dumpers.setDeserializer(deserializedFilePen);
             }
             Iterator<EnumPen> enumIterator = filePen.enumIterator();
@@ -108,7 +133,7 @@ public abstract class DumperPhase {
                 enumsNS.put(ep.pJavaFQN, ep.mJavaFQN);
             }
         } catch (Exception e) {
-            throw new DumpperException(e.getMessage());
+            throw new DumperException(e.getMessage());
         }
         return dumpers;
     }
@@ -128,7 +153,10 @@ public abstract class DumperPhase {
         while (messagesIterator.hasNext()) {
             //Each inner message is translated to public static method.
             MessagePen inMessage = messagesIterator.next();
-            SerializerMessagePen smp2 = sMessagePen.buildInn(inMessage.pJavaClass, inMessage.mJavaFQN, inMessage.pJavaClass, inMessage.parallel);
+            SerializerMessagePen smp2 = sMessagePen.buildInn(inMessage.pJavaClass,
+                    inMessage.mJavaFQN,
+                    inMessage.pJavaClass,
+                    inMessage.parallel);
             smp2.addMethod(inMessage.mJavaFQN, inMessage.pJavaClass, inMessage.pJavaFQN, inMessage.fieldIterator());
             serializeInnerMessage(inMessage, smp2, enumsNS);
         }
@@ -154,8 +182,14 @@ public abstract class DumperPhase {
         while (messagesIterator.hasNext()) {
             //Each inner message is translated to public static method.
             MessagePen inMessage = messagesIterator.next();
-            DeserializerMessagePen smp2 = smp.buildInn(inMessage.pJavaClass, inMessage.mJavaFQN, inMessage.pJavaClass, inMessage.parallel);
-            smp2.addMethod(inMessage.mJavaFQN, inMessage.pJavaClass, inMessage.pJavaFQN, inMessage.fieldIterator());
+            DeserializerMessagePen smp2 = smp.buildInn(inMessage.pJavaClass,
+                    inMessage.mJavaFQN,
+                    inMessage.pJavaClass,
+                    inMessage.parallel);
+            smp2.addMethod(inMessage.mJavaFQN,
+                    inMessage.pJavaClass,
+                    inMessage.pJavaFQN,
+                    inMessage.fieldIterator());
             deserializeInnerMessage(inMessage, smp2, enumsNS);
         }
         Iterator<EnumPen> enumIterator = mp.enumIterator();

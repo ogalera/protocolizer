@@ -26,6 +26,8 @@ import java.util.Map;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.type.MirroredTypeException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author Oscar Galera i Alfaro
@@ -34,6 +36,8 @@ import javax.lang.model.type.MirroredTypeException;
  * @brief Functional class for generate protoc files.
  */
 public abstract class GenerationPhase {
+
+    private static final Logger LOG = LogManager.getLogger();
 
     /**
      * @pre element is annotated with File.
@@ -49,11 +53,13 @@ public abstract class GenerationPhase {
             char separator = File.separatorChar;
             String protocPath = "src" + separator + "cat" + separator + "ogasoft" + separator + "protocolizer" + separator + "protoc";
             String protocFile = protocPath + File.separatorChar + pJavaName;
+            LOG.info("\tWriting " + protocFile + "...");
             File fProtocPath = new File(protocPath);
             if (!fProtocPath.exists() && !fProtocPath.mkdirs()) {
                 throw new Exception("Unable to generate destination directory for protoc [" + fProtocPath.getAbsolutePath() + "]");
             }
             filePen = generateProtoc(protocFile, element, mFQN2pFQN);
+            LOG.info("\t" + protocFile + " written");
         } catch (Exception e) {
             throw new GenerationException(e.getMessage());
         }
