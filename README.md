@@ -430,24 +430,24 @@ public abstract class Compiler {
 ## Basic complete example
 Generate a directory layout like:
 
-´´´
+```
     .\
      src
       |-- Protocolizer/ (Protocolizer.zip uncompressed)
       |-- com/google/protobuf/*.java (Protocol Buffer directory)
       |-- Message.java (Your message)
       |-- Compiler.java 
-´´´
+```
 
 And then execute somthing like to compile your code and generate messages:
 
-´´´
+```
 $JAVA_HOME/bin/javac -cp "./Protocolizer/*"  -proc:only -processor "cat.ogasoft.protocolizer.processor.ProtoFileProcessorV2" *.java
-´´´
+```
 
 If you get something like, all has been alright.
 
-´´´
+```
 11:28:39.587 [main] PROTOCOLIZER INFO  - Protocolizer Initiated
 11:28:39.588 [main] PROTOCOLIZER INFO  - ***GENERATION PHASE
 11:28:39.593 [main] PROTOCOLIZER INFO  -    Writing src/cat/ogasoft/protocolizer/protoc/Message...
@@ -463,11 +463,11 @@ If you get something like, all has been alright.
 11:28:39.662 [main] PROTOCOLIZER INFO  -    cat.ogasoft.protocolizer.messages.Message written
 11:28:39.663 [main] PROTOCOLIZER INFO  - 1 dumpers writen
 11:28:39.663 [main] PROTOCOLIZER INFO  - ALL OK!!!
-´´´
+```
 
 And you will get the following structure:
 
-´´´
+```
     .\
      src
       |-- Protocolizer/ (Protocolizer.zip uncompressed)
@@ -480,11 +480,11 @@ And you will get the following structure:
                                                   |-- serializers/...java
                                       |-- messages/...java
                                       |-- protoc/...protoc
-´´´
+```
 
 The following is a valid content for Message.java
 
-´´´
+```
 package src;
 import cat.ogasoft.protocolizer.annotations.ProtoFileV2;
 
@@ -510,12 +510,12 @@ public class Message {
         }
     }
 }
-´´´
+```
 
 The following is a valid content for Compiler.java
 
 
-´´´
+```
 package src;
 import cat.ogasoft.protocolizer.annotations.ProtoFileV2;
 
@@ -529,4 +529,4 @@ import cat.ogasoft.protocolizer.annotations.ProtoFileV2;
 public abstract class Compiler {
 
 }
-´´´
+```
