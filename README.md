@@ -463,7 +463,9 @@ If you get something like, all has been alright.
 11:28:39.663 [main] PROTOCOLIZER INFO  - 1 dumpers writen
 11:28:39.663 [main] PROTOCOLIZER INFO  - ALL OK!!!
 ´´´
+
 And you will get the following structure:
+
 ´´´
     .\
      src
@@ -480,6 +482,7 @@ And you will get the following structure:
 ´´´
 
 The following is a valid content for Message.java
+
 ´´´
 package src;
 import cat.ogasoft.protocolizer.annotations.ProtoFileV2;
@@ -509,6 +512,8 @@ public class Message {
 ´´´
 
 The following is a valid content for Compiler.java
+
+
 ´´´
 package src;
 import cat.ogasoft.protocolizer.annotations.ProtoFileV2;
