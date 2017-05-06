@@ -519,12 +519,6 @@ The following is a valid content for Compiler.java
 package src;
 import cat.ogasoft.protocolizer.annotations.ProtoFileV2;
 
-/**
- * @author Oscar Galera i Alfaro
- * @date   Apr 25, 2017 [10:11:06 PM]
- *
- * @brief DESCRIPTION
- */
 @ProtoFileV2.Compiler(command = "/opt/protoc-3.2.0-linux-x86_64/bin/protoc")
 public abstract class Compiler {
 
