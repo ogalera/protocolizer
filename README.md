@@ -448,21 +448,21 @@ $JAVA_HOME/bin/javac -cp "./Protocolizer/*"  -proc:only -processor "cat.ogasoft.
 If you get something like, all has been alright.
 
 ```
-11:28:39.587 [main] PROTOCOLIZER INFO  - Protocolizer Initiated
-11:28:39.588 [main] PROTOCOLIZER INFO  - ***GENERATION PHASE
-11:28:39.593 [main] PROTOCOLIZER INFO  -    Writing src/cat/ogasoft/protocolizer/protoc/Message...
-11:28:39.601 [main] PROTOCOLIZER INFO  -    src/cat/ogasoft/protocolizer/protoc/Message written
-11:28:39.603 [main] PROTOCOLIZER INFO  -    1 protoc files written
-11:28:39.603 [main] PROTOCOLIZER INFO  - ***COMPILER PHASE
-11:28:39.610 [main] PROTOCOLIZER INFO  -    Compiling src/cat/ogasoft/protocolizer/protoc/Message.proto...
-11:28:39.658 [main] PROTOCOLIZER INFO  -    src/cat/ogasoft/protocolizer/protoc/Message.proto compiled
-11:28:39.658 [main] PROTOCOLIZER INFO  - ***DUMPER PHASE
-11:28:39.660 [main] PROTOCOLIZER INFO  -    Writing serializer for cat.ogasoft.protocolizer.messages.Message...
-11:28:39.661 [main] PROTOCOLIZER INFO  -    cat.ogasoft.protocolizer.messages.Message written
-11:28:39.661 [main] PROTOCOLIZER INFO  -    Writing deserializer for cat.ogasoft.protocolizer.messages.Message...
-11:28:39.662 [main] PROTOCOLIZER INFO  -    cat.ogasoft.protocolizer.messages.Message written
-11:28:39.663 [main] PROTOCOLIZER INFO  - 1 dumpers writen
-11:28:39.663 [main] PROTOCOLIZER INFO  - ALL OK!!!
+11:43:45.940 [main] PROTOCOLIZER INFO  - Protocolizer Initiated
+11:43:45.941 [main] PROTOCOLIZER INFO  - ***GENERATION PHASE
+11:43:45.944 [main] PROTOCOLIZER INFO  -    Writing src/cat/ogasoft/protocolizer/protoc/Message...
+11:43:45.950 [main] PROTOCOLIZER INFO  -    src/cat/ogasoft/protocolizer/protoc/Message written
+11:43:45.950 [main] PROTOCOLIZER INFO  -    1 protoc files written
+11:43:45.950 [main] PROTOCOLIZER INFO  - ***COMPILER PHASE
+11:43:45.956 [main] PROTOCOLIZER INFO  -    Compiling src/cat/ogasoft/protocolizer/protoc/Message.proto...
+11:43:45.997 [main] PROTOCOLIZER INFO  -    src/cat/ogasoft/protocolizer/protoc/Message.proto compiled
+11:43:45.997 [main] PROTOCOLIZER INFO  - ***DUMPER PHASE
+11:43:46.001 [main] PROTOCOLIZER INFO  -    Writing serializer for cat.ogasoft.protocolizer.messages.Message...
+11:43:46.002 [main] PROTOCOLIZER INFO  -    cat.ogasoft.protocolizer.messages.Message written
+11:43:46.002 [main] PROTOCOLIZER INFO  -    Writing deserializer for cat.ogasoft.protocolizer.messages.Message...
+11:43:46.003 [main] PROTOCOLIZER INFO  -    cat.ogasoft.protocolizer.messages.Message written
+11:43:46.006 [main] PROTOCOLIZER INFO  -    1 dumpers written
+11:43:46.006 [main] PROTOCOLIZER INFO  - ALL OK!!!
 ```
 
 And you will get the following structure:
@@ -484,7 +484,7 @@ And you will get the following structure:
 
 The following is a valid content for Message.java
 
-```
+```java
 package src;
 import cat.ogasoft.protocolizer.annotations.ProtoFileV2;
 
@@ -515,7 +515,7 @@ public class Message {
 The following is a valid content for Compiler.java
 
 
-```
+```java
 package src;
 import cat.ogasoft.protocolizer.annotations.ProtoFileV2;
 

@@ -133,7 +133,7 @@ public class ProtoFileProcessorV2 extends AbstractProcessor {
                     dumperFilePen.getDeserializer().dumpDeserialize();
                 }
             }
-            LOG.info(dummperFilePens.size() + " dumpers writen");
+            LOG.info("\t" + dummperFilePens.size() + " dumpers written");
             LOG.info("ALL OK!!!");
         } catch (GenerationException ge) {
             LOG.info("FAILED!!!, Generation phase ERROR, message: " + ge.getMessage());
